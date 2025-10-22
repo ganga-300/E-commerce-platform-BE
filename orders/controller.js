@@ -1,29 +1,25 @@
-const { createOrder, getOrderByUserId } = require("../services/orderService");
+const { placeOrder, viewOrdersByUserId } = require("./service.js");
 
-
-async function createNewOrder(req, res) {
+async function placeUserOrder(req, res) {
+  const { userId } = req.params;
   try {
-    const userId = req.body.userId;
-    const items = req.body.items; 
-
-    const order = await createOrder(userId, items);
-    res.status(201).json({ message: "Order created successfully", order });
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).json({ error: "Failed to create order" });
+    const order = await placeOrder(Number(userId));
+    res.status(201).json({ message: "Order placed successfully", order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
   }
 }
-
 
 async function getUserOrders(req, res) {
+  const { userId } = req.params;
   try {
-    const userId = req.params.userId;
-    const orders = await getOrderByUserId(userId);
+    const orders = await viewOrdersByUserId(Number(userId));
     res.json(orders);
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ error: "Failed to fetch orders" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch orders" });
   }
 }
 
-module.exports = { createNewOrder, getUserOrders };
+module.exports = { placeUserOrder, getUserOrders };

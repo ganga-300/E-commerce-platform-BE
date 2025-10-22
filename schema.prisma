@@ -59,17 +59,13 @@ model Cart {
 }
 
 model Order {
-  id          Int       @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   userId      Int
-  productId   Int
-  quantity    Int
-  status      String    @default("Pending")
-  createdAt   DateTime  @default(now())
+  status      String       @default("Pending")
+  createdAt   DateTime     @default(now())
   deliveredAt DateTime?
 
-  // Relations
-  user        User      @relation(fields: [userId], references: [id])
-  product     Products  @relation(fields: [productId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
   orderItems  OrderItem[]
 }
 
@@ -78,8 +74,8 @@ model OrderItem {
   orderId   Int
   productId Int
   quantity  Int
+  price     Float
 
- 
   order     Order     @relation(fields: [orderId], references: [id])
   product   Products  @relation(fields: [productId], references: [id])
 }
