@@ -1,14 +1,21 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+async function createProductsFromDB(name,description,price,stock,sku,family,imageUrl) {
+  const product = await prisma.Products.create({
+    data : {name,description,price,stock,sku,family,imageUrl}
+  })
+  return product
+}
+
 async function getProductsFromDB() {
-  const products = await prisma.products.findMany();
+  const products = await prisma.Products.findMany();
   return products;
 }
 
 
 async function getProductsFromId(id){
-    const product = await prisma.products.findUnique({
+    const product = await prisma.Products.findUnique({
         where: {id:id}
     });
         return product
@@ -17,7 +24,7 @@ async function getProductsFromId(id){
 
 
 async function searchProductsInDB(searchTerm) {
-  const results = await prisma.products.findMany({
+  const results = await prisma.Products.findMany({
     where: {
       OR: [
         { name: { contains: searchTerm, mode: "insensitive" } },
@@ -30,5 +37,5 @@ async function searchProductsInDB(searchTerm) {
 
 
 
-module.exports = { getProductsFromDB ,getProductsFromId,searchProductsInDB};
+module.exports = { createProductsFromDB,getProductsFromDB ,getProductsFromId,searchProductsInDB};
 

@@ -1,12 +1,24 @@
 //internal orchestrations
-const userRoutes = require("express").Router();
+const express = require("express");
+const {
+  createUserData,
+  findAllUserData,
+  updateUserData,
+  deleteUserData
+} = require("./controller"); 
 
-userRoutes.post("/", validateUser, () => {
-    console.log("/post api made")
-})
+const router = express.Router();
 
-userRoutes.get("/", () => {
-    console.log("/get api made")
-})
+// Create user
+router.post("/", createUserData);
 
-module.exports = { userRoutes }
+// Get all users
+router.get("/", findAllUserData);
+
+// Update user
+router.put("/", updateUserData);
+
+// Delete user
+router.delete("/", deleteUserData);
+
+module.exports = router;

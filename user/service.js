@@ -1,21 +1,22 @@
 //db interactions
 
 const { application } = require('express');
-const prisma = require('../db/config');
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const createUser = async (name, email) => {
-    return await prisma.contact.create({data:{name,email}})
+const createUser = async (userName, email,password,role) => {
+    return await prisma.user.create({data:{userName,email,password,role}})
 
 };
 
 const getUser = async () => {
-    return await prisma.contact.findMany()
+    return await prisma.user.findMany()
 
 
 };
     
 const updateUser = async (name, email) => {
-     return await prisma.contact.update({
+     return await prisma.user.update({
            where :  {email},
            data : {name}
      })
@@ -23,7 +24,7 @@ const updateUser = async (name, email) => {
 };
 
 const deleteUser = async (email) => {
-     return await prisma.contact.delete({
+     return await prisma.user.delete({
            where : {email}
 
      })

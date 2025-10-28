@@ -6,7 +6,8 @@ const { createUser, getUser, updateUser, deleteUser } = require('./service');
 const createUserData = async (req, res) => {
 
     try {
-        const user = await createUser(name, email);
+         const { userName, email,password ,role} = req.body;
+        const user = await createUser(userName, email,password,role);
         res.json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });

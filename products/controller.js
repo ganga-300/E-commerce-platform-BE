@@ -1,16 +1,17 @@
-const { Prisma } = require("@prisma/client");
-const { getProductsFromDB, searchProductsInDB, getProductsFromId } = require("./service.js");
 
-async function getAllProducts(req, res) {
-  try {
-    const products = await getProductsFromDB();
-    res.status(200).json(products);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Something went wrong" });
+const {createProductsFromDB, searchProductsInDB, getProductsFromId } = require("./service.js");
+
+async function createProducts(req,res){
+  try{
+
+    const {name,description,price,stock,sku,family,imageUrl} = req.body
+    const product = await createProductsFromDB(name,description,price,stock,sku,family,imageUrl);
+    res.json(product)
+
+  }catch(err){
+      res.status(500).json({ message: "Error fetching product by ID" });
   }
 }
-
 
 async function getIdProduct(req, res) {
   try {
@@ -43,4 +44,5 @@ async function getSearchProducts(req, res) {
   }
 }
 
-module.exports = { getAllProducts ,getSearchProducts,getIdProduct};
+module.exports = { createProducts ,getSearchProducts,getIdProduct};
+
