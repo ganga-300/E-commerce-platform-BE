@@ -10,13 +10,13 @@ const {
 const router = express.Router();
 
 // Create user
-router.post("/", createUserData);
+router.post("/", validateUser,createUserData);
 
 // Get all users
 router.get("/", findAllUserData);
 
 // Update user
-router.put("/", updateUserData);
+router.put("/", validateUpdateuser ,updateUserData);
 
 // Delete user
 router.delete("/", deleteUserData);

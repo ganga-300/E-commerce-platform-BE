@@ -13,3 +13,6 @@ router.get("/:id", validateProductId, getIdProduct);
 
 
 module.exports = router
+
+
+

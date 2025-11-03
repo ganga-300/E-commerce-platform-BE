@@ -6,7 +6,7 @@ const { use } = require("react");
 async function AddProduct(req, res) {
     const { userId, productId, quantity } = req.body
     try {
-        const newProduct = await AddProductToCart(userId, productId, quantity)
+        const newProduct = await AddProductToCart({userId, productId, quantity})
         res.status(201).json(newProduct);
 
     } catch (error) {
@@ -46,7 +46,7 @@ async function updateQuantity(req, res) {
     const { quantity } = req.body
     try {
 
-        const updated = updateQuantityInCart(cartId, quantity);
+        const updated = updateQuantityInCart({cartId, quantity});
         res.json({
             message: "Quantity updated successfully",
             updatedItem: updated,
