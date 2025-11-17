@@ -19,6 +19,9 @@ const authRouter = require("./auth/route");
 const { verifyToken } = require("./shared/middlewares/verifyToken");
 
 const PORT = process.env.PORT || 8000;
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully!");
+});
 
 app.use("/api/users", verifyToken, userRouter);
 app.use("/api/auth", authRouter);
