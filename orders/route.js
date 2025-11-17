@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { placeUserOrder, getUserOrders } = require(".controller.js");
+const { placeUserOrder, getUserOrders } = require("./controller.js");
 
 
 router.post("/place/:userId", placeUserOrder);

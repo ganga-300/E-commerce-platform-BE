@@ -42,10 +42,10 @@ async function viewOrdersByUserId(userId) {
 }
 
 module.exports = {
-  AddProductToCart,
-  viewCartByUserId,
-  updateQuantityInCart,
-  deleteProductFromCart,
+  // AddProductToCart,
+  // viewCartByUserId,
+  // updateQuantityInCart,
+  // deleteProductFromCart,
   placeOrder,
   viewOrdersByUserId,
 };

@@ -1,21 +1,29 @@
-
-
-const express = require('express');
-const userRoutes = require('./user/route');
-const productRoutes = require('./products/route')
+const express = require("express");
 const app = express();
-const port = 3000;
+const cors = require("cors");
+require("dotenv").config();
 
 app.use(express.json());
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+const userRouter = require("./user/route");
+const authRouter = require("./auth/route");
+const { verifyToken } = require("./shared/middlewares/verifyToken");
+
+const PORT = process.env.PORT || 8000;
+
+app.use("/api/users", verifyToken, userRouter);
+app.use("/api/auth", authRouter);
+
+app.listen(PORT, () => {
+  console.log(`Backend server running on http://localhost:${PORT}`);
 });
 
-app.use("/api/user", userRoutes);
-app.use('/api/products',productRoutes)
-
-app.listen(port, () => {
-    console.log(`✅ Server running at http://localhost:${port}`);
-});

@@ -1,55 +1,56 @@
-//client interaction
+const { createUser, getUsers, updateUser, deleteUser, getUserById } = require("./service");
 
-const { createUser, getUser, updateUser, deleteUser } = require('./service');
-
-// Create user
 const createUserData = async (req, res) => {
-
+    const { userName, email, password, role } = req.body;
     try {
-         const { userName, email,password ,role} = req.body;
-        const user = await createUser(userName, email,password,role);
-        res.json(user);
+        const user = await createUser(userName, email, password, role);
+        res.status(201).json({ message: "User created successfully", user });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Find all users
 const findAllUserData = async (req, res) => {
     try {
-        const users = await getUser();
-        res.json(users);
+        const users = await getUsers();
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Delete user by email
-const deleteUserData = async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ error: "Email is required." });
-    }
-    try {
-        const user = await deleteUser(email);
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// Update user by email
 const updateUserData = async (req, res) => {
-    const { email, name } = req.body;
-    if (!email || !name) {
-        return res.status(400).json({ error: "Email and Name are required." });
-    }
+    const { id } = req.params;
+    const { userName } = req.body;
+
     try {
-        const user = await updateUser(name, email);
-        res.json(user);
+        const user = await updateUser(id, userName);
+        res.status(200).json({ message: "User updated successfully", user });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-module.exports = { createUserData, deleteUserData, findAllUserData, updateUserData };
+const deleteUserData = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await deleteUser(id);
+        res.status(200).json({ message: "User deleted successfully", user });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+const getProfile = async (req, res) => {
+    try {
+        const user = await getUserById(req.userId);
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+module.exports = { createUserData, findAllUserData, updateUserData, deleteUserData, getProfile };

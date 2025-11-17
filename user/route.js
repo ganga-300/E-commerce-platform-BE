@@ -1,24 +1,27 @@
-//internal orchestrations
 const express = require("express");
-const {
-  createUserData,
-  findAllUserData,
-  updateUserData,
-  deleteUserData
-} = require("./controller"); 
-
 const router = express.Router();
 
-// Create user
-router.post("/", validateUser,createUserData);
+const {
+    createUserData,
+    findAllUserData,
+    updateUserData,
+    deleteUserData,
+    getProfile
+} = require("./controller");
 
-// Get all users
+const {
+    validateUser,
+    validateUpdateUser
+} = require("./middleware");
+
+router.post("/", validateUser, createUserData);
+
 router.get("/", findAllUserData);
 
-// Update user
-router.put("/", validateUpdateuser ,updateUserData);
+router.put("/:id", validateUpdateUser, updateUserData);
 
-// Delete user
-router.delete("/", deleteUserData);
+router.delete("/:id", deleteUserData);
+
+router.get("/profile", getProfile);
 
 module.exports = router;
