@@ -1,9 +1,10 @@
-const { createUser, getUsers, updateUser, deleteUser, getUserById } = require("./service");
+const { createUser, getUser: getUsers, updateUser, deleteUser, getUserById } = require("./service");
 
 const createUserData = async (req, res) => {
     const { userName, email, password, role } = req.body;
+    console.log(req.body,"this is body");
     try {
-        const user = await createUser(userName, email, password, role);
+        const user = await createUser({ userName, email, password, role });
         res.status(201).json({ message: "User created successfully", user });
     } catch (error) {
         res.status(500).json({ error: error.message });

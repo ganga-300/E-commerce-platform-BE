@@ -9,6 +9,7 @@ const registerUser = async (req, res) => {
   const { userName, email, password, role } = req.body;
 
   try {
+    console.log('registerUser body:', req.body);
     const user = await handleSignup({ userName, email, password, role })
     return res.status(201).json({
       message: "User registered successfully",
@@ -16,7 +17,7 @@ const registerUser = async (req, res) => {
         id: user.id,
         email: user.email,
         userName: user.userName,
-        Role: user.role,
+        Role: 'BUYER'
       },
     });
   } catch (error) {
