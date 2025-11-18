@@ -33,10 +33,10 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const { accesToken, user } = await handleLogin({ email, password })
+    const { accessToken, user } = await handleLogin({ email, password })
     return res.status(200).json({
       message: "Login successful",
-      token: accesToken,
+      token: accessToken,
       user: {
         id: user.id,
         email: user.email,

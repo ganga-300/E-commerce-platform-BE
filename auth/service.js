@@ -33,8 +33,8 @@ const handleLogin = async ({ email, password }) => {
     err.status = 400;
     throw err;
   }
-  const accesToken = generateToken(user)
-  return { accesToken, user }
+  const accessToken = generateToken(user)
+  return { accessToken, user }
 }
 
 
