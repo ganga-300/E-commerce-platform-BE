@@ -3,7 +3,6 @@ generator client {
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -14,12 +13,12 @@ model User {
   userName  String
   email     String   @unique
   password  String
-  role      Role 
+  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orders    Order[]
-  carts     Cart[]
+  orders Order[]
+  carts  Cart[]
 }
 
 enum Role {
@@ -40,8 +39,8 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  carts       Cart[]
-  orderItems  OrderItem[]
+  carts      Cart[]
+  orderItems OrderItem[]
 }
 
 model Cart {
@@ -53,34 +52,34 @@ model Cart {
   updatedAt DateTime @updatedAt
 
   // Relations (store references by IDs)
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 }
 
 model Order {
-  id          String       @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  status      String       @default("Pending")
-  createdAt   DateTime     @default(now())
+  status      String    @default("Pending")
+  createdAt   DateTime  @default(now())
   deliveredAt DateTime?
 
-  user        User         @relation(fields: [userId], references: [id])
-  orderItems  OrderItem[]
+  user       User        @relation(fields: [userId], references: [id])
+  orderItems OrderItem[]
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
+  id        String @id @default(cuid())
   orderId   String
   productId String
   quantity  Int
   price     Float
 
-  order     Order    @relation(fields: [orderId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Invoice {
-  id      String   @id @default(cuid())
+  id      String @id @default(cuid())
   orderId String
   link    String
 }
