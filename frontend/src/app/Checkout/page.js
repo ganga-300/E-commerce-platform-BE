@@ -14,21 +14,22 @@ import {
   Truck,
   Star,
 } from "lucide-react"
+import Image from "next/image"
 
 export default function ProfessionalCheckout() {
   const [currentStep, setCurrentStep] = useState(1)
-  const [paymentStatus, setPaymentStatus] = useState("pending") 
-  const [timeLeft, setTimeLeft] = useState(600) 
+  const [paymentStatus, setPaymentStatus] = useState("pending")
+  const [timeLeft, setTimeLeft] = useState(600)
   const [orderNumber, setOrderNumber] = useState("")
   const [paymentVerified, setPaymentVerified] = useState(false)
   const router = useRouter()
 
- 
+
   useEffect(() => {
     setOrderNumber(`SS${Date.now().toString().slice(-6)}`)
   }, [])
 
-  
+
   useEffect(() => {
     if (currentStep === 2 && paymentStatus === "pending" && timeLeft > 0) {
       const timer = setInterval(() => {
@@ -38,7 +39,7 @@ export default function ProfessionalCheckout() {
     }
   }, [currentStep, paymentStatus, timeLeft])
 
- 
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -56,16 +57,16 @@ export default function ProfessionalCheckout() {
 
     // Simulate payment verification (replace with actual API call)
     setTimeout(() => {
-      
-     
-      const paymentVerified = true 
+
+
+      const paymentVerified = true
 
       if (paymentVerified) {
         setPaymentStatus("completed")
         setCurrentStep(3)
       } else {
         setPaymentStatus("failed")
-      
+
       }
     }, 3000)
   }
@@ -83,7 +84,7 @@ export default function ProfessionalCheckout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    
+
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
@@ -99,16 +100,15 @@ export default function ProfessionalCheckout() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-     
+
         <div className="mb-8">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
-                      currentStep >= step.number ? "bg-[#637D37] text-white" : "bg-gray-200 text-gray-500"
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${currentStep >= step.number ? "bg-[#637D37] text-white" : "bg-gray-200 text-gray-500"
+                      }`}
                   >
                     {currentStep > step.number ? <CheckCircle className="w-5 h-5" /> : step.number}
                   </div>
@@ -119,9 +119,8 @@ export default function ProfessionalCheckout() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`flex-1 h-0.5 mx-4 transition-all ${
-                      currentStep > step.number ? "bg-[#637D37]" : "bg-gray-200"
-                    }`}
+                    className={`flex-1 h-0.5 mx-4 transition-all ${currentStep > step.number ? "bg-[#637D37]" : "bg-gray-200"
+                      }`}
                   />
                 )}
               </div>
@@ -129,22 +128,24 @@ export default function ProfessionalCheckout() {
           </div>
         </div>
 
-      
+
         {currentStep === 1 && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-             
+
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                   <Package className="w-5 h-5" />
                   Your Items
                 </h2>
                 <div className="space-y-4">
-               
+
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                    <img
-                      src="/placeholder.svg?height=80&width=80"
+                    <Image
+                      src="/placeholder.svg"
                       alt="Study Material"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
@@ -159,7 +160,7 @@ export default function ProfessionalCheckout() {
                 </div>
               </div>
 
-            
+
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                   <Truck className="w-5 h-5" />
@@ -175,7 +176,7 @@ export default function ProfessionalCheckout() {
               </div>
             </div>
 
-          
+
             <div className="lg:col-span-1">
               <div className="bg-white rounded-xl p-6 shadow-sm border lg:sticky lg:top-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
@@ -216,7 +217,7 @@ export default function ProfessionalCheckout() {
           </div>
         )}
 
-      
+
         {currentStep === 2 && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-xl p-8 shadow-sm border text-center">
@@ -230,7 +231,7 @@ export default function ProfessionalCheckout() {
                     <p className="text-gray-600">Complete your payment using any UPI app</p>
                   </div>
 
-                
+
                   <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
                     <div className="flex items-center justify-center gap-2 text-orange-700">
                       <Clock className="w-5 h-5" />
@@ -238,18 +239,20 @@ export default function ProfessionalCheckout() {
                     </div>
                   </div>
 
-               
+
                   <div className="mb-6">
                     <div className="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-gray-300 inline-block">
-                      <img
-                        src="/placeholder.svg?height=200&width=200"
+                      <Image
+                        src="/placeholder.svg"
                         alt="Payment QR Code"
+                        width={200}
+                        height={200}
                         className="w-48 h-48 mx-auto"
                       />
                     </div>
                   </div>
 
-               
+
                   <div className="bg-gray-50 rounded-lg p-4 mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
@@ -272,7 +275,7 @@ export default function ProfessionalCheckout() {
                     </div>
                   </div>
 
-                 
+
                   <div className="text-left bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
                       <Smartphone className="w-4 h-4" />
@@ -296,7 +299,7 @@ export default function ProfessionalCheckout() {
                     </button>
 
                     <p className="text-xs text-gray-500 text-center">
-                      Click only after completing the UPI payment. We'll verify your transaction automatically.
+                      Click only after completing the UPI payment. We&apos;ll verify your transaction automatically.
                     </p>
                   </div>
 
@@ -320,7 +323,7 @@ export default function ProfessionalCheckout() {
           </div>
         )}
 
-       
+
         {currentStep === 3 && (
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-white rounded-xl p-8 shadow-sm border">
