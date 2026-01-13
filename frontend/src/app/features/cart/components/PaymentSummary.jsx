@@ -1,9 +1,11 @@
 "use client";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
 
 export default function PaymentSummary() {
   const { quantity } = useCart();
+  const router = useRouter();
   const cartItems = Object.values(quantity);
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
@@ -49,7 +51,10 @@ export default function PaymentSummary() {
           </div>
         </div>
 
-        <button className="w-full bg-[#728F41] hover:bg-[#5f7220] text-white font-bold py-4 mt-6 rounded-lg transition flex items-center justify-center gap-2">
+        <button
+          onClick={() => router.push("/checkout")}
+          className="w-full bg-[#728F41] hover:bg-[#5f7220] text-white font-bold py-4 mt-6 rounded-lg transition flex items-center justify-center gap-2"
+        >
           <ShoppingCart className="w-5 h-5" />
           PLACE ORDER
         </button>

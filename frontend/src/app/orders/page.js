@@ -98,9 +98,17 @@ export default function MyOrders() {
                                         </p>
                                     </div>
                                     <div className="space-y-1">
+                                        <p className="text-sm text-gray-500 font-medium flex items-center gap-1">
+                                            <Truck className="w-4 h-4" /> Ship to
+                                        </p>
+                                        <p className="text-gray-900 font-medium truncate max-w-[200px]">
+                                            {order.shippingAddress || "N/A"}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-1">
                                         <p className="text-sm text-gray-500 font-medium">Total Amount</p>
                                         <p className="text-[#637D37] font-bold text-lg">
-                                            ₹{order.orderItems?.reduce((acc, item) => acc + (item.price * item.quantity), 0) || 0}
+                                            ₹{order.totalAmount || order.orderItems?.reduce((acc, item) => acc + (item.price * item.quantity), 0) || 0}
                                         </p>
                                     </div>
                                     <div className={`px-4 py-2 rounded-lg border flex items-center gap-2 font-medium ${getStatusColor(order.status)}`}>

@@ -1,15 +1,34 @@
 "use client"
+import { useState, useEffect } from "react"
 import ProductCard from "./ProductCard"
-
-const productList = [
-  { id: "1", image: "/placeholder.svg", name: "Classmate Notebook", quantity: "200 Pages", price: 65 },
-  { id: "2", image: "/placeholder.svg", name: "Camlin Geometry Box", quantity: "1 Set", price: 70 },
-  { id: "3", image: "/placeholder.svg", name: "Apsara Platinum Pencils", quantity: "Pack of 10", price: 30 },
-  { id: "4", image: "/placeholder.svg", name: "Camel Poster Colours", quantity: "12 Shades", price: 120 },
-  { id: "5", image: "/placeholder.svg", name: "Fevicol MR", quantity: "200 g", price: 35 },
-]
+import { Loader2 } from "lucide-react"
 
 export default function ProductsSection() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`)
+        if (!res.ok) throw new Error("Failed to fetch")
+        const data = await res.json()
+        setProducts(data)
+      } catch (err) {
+        console.error("Home Products Fetch Error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
+  if (loading) return (
+    <div className="flex justify-center py-20">
+      <Loader2 className="animate-spin text-[#637D37] w-10 h-10" />
+    </div>
+  )
+
   return (
     <section className="min-h-screen bg-gray-50 py-20 px-6">
       <div className="max-w-7xl mx-auto">
@@ -19,9 +38,13 @@ export default function ProductsSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
-          {productList.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products.length === 0 ? (
+            <p className="text-gray-500 col-span-full">No products available yet.</p>
+          ) : (
+            products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
         </div>
       </div>
     </section>

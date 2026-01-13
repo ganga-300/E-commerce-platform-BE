@@ -1,6 +1,7 @@
 "use client"
 import { useCart } from "@/contexts/CartContext"
 import { Plus, Minus, Heart } from "lucide-react"
+import Link from "next/link"
 import Image from "next/image"
 
 export default function ProductCard({ product }) {
@@ -9,20 +10,22 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden w-full max-w-[260px]">
-      <div className="relative w-full h-56 overflow-hidden cursor-pointer" onClick={() => window.location.href = `/product/${product.id}`}>
+      <Link href={`/product/${product.id}`} className="relative block w-full h-56 overflow-hidden cursor-pointer">
         <Image
           src={product.imageUrl || product.image || "/placeholder.svg"}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <button className="absolute top-3 right-3 bg-white/70 rounded-full p-2 hover:bg-white" onClick={(e) => e.stopPropagation()}>
+        <button className="absolute top-3 right-3 bg-white/70 rounded-full p-2 hover:bg-white" onClick={(e) => e.preventDefault()}>
           <Heart className="w-5 h-5 text-gray-600 hover:text-red-500" />
         </button>
-      </div>
+      </Link>
 
       <div className="p-4 text-center">
-        <h3 className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-[#637D37]" onClick={() => window.location.href = `/product/${product.id}`}>{product.name}</h3>
+        <Link href={`/product/${product.id}`}>
+          <h3 className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-[#637D37]">{product.name}</h3>
+        </Link>
         <p className="text-sm text-gray-500">{product.quantity}</p>
         <p className="text-lg font-medium text-primary mt-2">₹{product.price}</p>
 

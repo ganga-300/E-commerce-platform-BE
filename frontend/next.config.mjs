@@ -8,7 +8,15 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'example.com', // Placeholder
+                hostname: 'www.amazon.in',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images-na.ssl-images-amazon.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'example.com',
             }
         ],
     },

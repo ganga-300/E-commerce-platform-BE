@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { PlusCircle, Loader2 } from "lucide-react"
+import { PlusCircle, Loader2, Upload } from "lucide-react"
+import Script from "next/script"
 
 export default function SellerDashboard() {
     const { user, token, loading: authLoading } = useAuth()
@@ -53,6 +54,45 @@ export default function SellerDashboard() {
             }
         }
     }, [user, authLoading, router])
+
+    const handleUpload = () => {
+        if (!window.cloudinary) {
+            console.error("Cloudinary script not loaded");
+            alert("Upload widget is still loading... please refresh or wait a moment.");
+            return;
+        }
+
+        // NOTE: For a real app, you should use your own Cloudinary Cloud Name and Upload Preset
+        // You can get them for free at https://cloudinary.com/
+        window.cloudinary.openUploadWidget(
+            {
+                cloudName: "da8wt2pys",
+                uploadPreset: "btfgadxx",
+                sources: ["local", "url", "camera", "google_drive"],
+                multiple: false,
+                cropping: true,
+                defaultSource: "local"
+            },
+            (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Error:", error);
+                    alert("Upload failed. Please check your internet or try again.");
+                }
+
+                // CRITICAL UI FIX: Ensure body scroll is restored
+                if (result && (result.event === "success" || result.event === "close")) {
+                    document.body.style.overflow = "auto";
+                    document.body.style.pointerEvents = "auto";
+                }
+
+                if (!error && result && result.event === "success") {
+                    console.log("Upload Success:", result.info.secure_url);
+                    setImageUrl(result.info.secure_url);
+                    setMessage("Image uploaded successfully!");
+                }
+            }
+        ).open();
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -110,6 +150,7 @@ export default function SellerDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="afterInteractive" />
             <div className="max-w-3xl mx-auto">
                 <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
                     <PlusCircle className="w-8 h-8 text-[#637D37]" />
@@ -198,15 +239,33 @@ export default function SellerDashboard() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                            <input
-                                type="url"
-                                required
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
-                                placeholder="https://..."
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                            />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                            <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                                {imageUrl ? (
+                                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
+                                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setImageUrl("")}
+                                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg hover:bg-red-600 transition"
+                                        >
+                                            <PlusCircle className="w-4 h-4 rotate-45" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={handleUpload}
+                                        className="flex flex-col items-center gap-2 text-gray-500 hover:text-[#637D37] transition"
+                                    >
+                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border">
+                                            <Upload className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-sm font-medium">Click to upload from device</span>
+                                    </button>
+                                )}
+                                <p className="text-xs text-gray-400">Supports JPG, PNG up to 5MB</p>
+                            </div>
                         </div>
 
                         <button

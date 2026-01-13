@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import {
   ArrowLeft,
   Shield,
@@ -21,6 +22,14 @@ export default function ProfessionalCheckout() {
   const { user, token } = useAuth()
   const { quantity: cart, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
+  const [address, setAddress] = useState({
+    name: user?.userName || "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: ""
+  })
   const [paymentStatus, setPaymentStatus] = useState("pending")
   const [timeLeft, setTimeLeft] = useState(600)
   const [orderNumber, setOrderNumber] = useState("")
@@ -37,7 +46,7 @@ export default function ProfessionalCheckout() {
 
 
   useEffect(() => {
-    if (currentStep === 2 && paymentStatus === "pending" && timeLeft > 0) {
+    if (currentStep === 3 && paymentStatus === "pending" && timeLeft > 0) {
       const timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1)
       }, 1000)
@@ -52,8 +61,17 @@ export default function ProfessionalCheckout() {
     return `${mins}:${secs.toString().padStart(2, "0")}`
   }
 
-  const handleProceedToPayment = () => {
+  const handleProceedToAddress = () => {
     setCurrentStep(2)
+  }
+
+  const handleProceedToPayment = () => {
+    // Validate address
+    if (!address.address || !address.city || !address.phone) {
+      alert("Please fill in the required shipping details")
+      return
+    }
+    setCurrentStep(3)
   }
 
   const handlePaymentComplete = async () => {
@@ -73,7 +91,8 @@ export default function ProfessionalCheckout() {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          items: cartItems // Our backend now accepts this!
+          items: cartItems,
+          shippingDetails: address
         })
       })
 
@@ -84,7 +103,7 @@ export default function ProfessionalCheckout() {
 
       setPaymentStatus("completed")
       clearCart()
-      setCurrentStep(3)
+      setCurrentStep(4)
     } catch (err) {
       alert(`Error: ${err.message}`)
       setPaymentStatus("pending")
@@ -97,9 +116,10 @@ export default function ProfessionalCheckout() {
   }
 
   const steps = [
-    { number: 1, title: "Order Review", description: "Review your items" },
-    { number: 2, title: "Payment", description: "Complete payment" },
-    { number: 3, title: "Confirmation", description: "Order confirmed" },
+    { number: 1, title: "Review", description: "Review items" },
+    { number: 2, title: "Address", description: "Shipping info" },
+    { number: 3, title: "Payment", description: "Complete pay" },
+    { number: 4, title: "Done", description: "Confirmation" },
   ]
 
   return (
@@ -194,7 +214,7 @@ export default function ProfessionalCheckout() {
                     <CheckCircle className="w-5 h-5" />
                     <span className="font-semibold">Free Delivery</span>
                   </div>
-                  <p className="text-sm text-green-600 mt-1">Digital delivery - Instant access after payment</p>
+                  <p className="text-sm text-green-600 mt-1">Standard Shipping - Usually arrives in 3-5 business days</p>
                 </div>
               </div>
             </div>
@@ -225,10 +245,10 @@ export default function ProfessionalCheckout() {
                 </div>
 
                 <button
-                  onClick={handleProceedToPayment}
+                  onClick={handleProceedToAddress}
                   className="w-full bg-[#637D37] hover:bg-[#4a5a2a] text-white font-bold py-4 mt-6 rounded-lg transition-all duration-200 transform hover:scale-105"
                 >
-                  PROCEED TO PAYMENT
+                  PROCEED TO ADDRESS
                 </button>
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
@@ -242,6 +262,110 @@ export default function ProfessionalCheckout() {
 
 
         {currentStep === 2 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-[#637D37]" />
+                  Shipping Address
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      value={address.name}
+                      onChange={(e) => setAddress({ ...address, name: e.target.value })}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      value={address.phone}
+                      onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                      placeholder="10-digit mobile number"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                    <textarea
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      rows="3"
+                      value={address.address}
+                      onChange={(e) => setAddress({ ...address, address: e.target.value })}
+                      placeholder="House No, Street, Landmark"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      value={address.city}
+                      onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                      placeholder="City"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      placeholder="State"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                      value={address.zip}
+                      onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+                      placeholder="6-digit ZIP code"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl p-6 shadow-sm border lg:sticky lg:top-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+                <div className="space-y-3 text-sm mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Items Total</span>
+                    <span className="font-semibold">₹{totalAmount}</span>
+                  </div>
+                  <div className="flex justify-between text-green-600 font-bold">
+                    <span>Total Amount</span>
+                    <span>₹{totalAmount}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleProceedToPayment}
+                  className="w-full bg-[#637D37] hover:bg-[#4a5a2a] text-white font-bold py-4 rounded-lg transition-all"
+                >
+                  PROCEED TO PAYMENT
+                </button>
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="w-full mt-3 text-gray-500 hover:text-gray-700 text-sm font-medium"
+                >
+                  Back to Review
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-xl p-8 shadow-sm border text-center">
               {paymentStatus === "pending" && (
@@ -347,7 +471,7 @@ export default function ProfessionalCheckout() {
         )}
 
 
-        {currentStep === 3 && (
+        {currentStep === 4 && (
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-white rounded-xl p-8 shadow-sm border">
               <div className="mb-6">
@@ -360,7 +484,7 @@ export default function ProfessionalCheckout() {
 
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
                 <h3 className="font-bold text-green-800 mb-2">Order #{orderNumber}</h3>
-                <p className="text-green-700">Your study materials will be available for download shortly.</p>
+                <p className="text-green-700">Your stationery items will be shipped to your address shortly.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -372,9 +496,9 @@ export default function ProfessionalCheckout() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-800 mb-2">Delivery Info</h4>
-                  <p className="text-sm text-gray-600">Type: Digital Download</p>
-                  <p className="text-sm text-gray-600">Access: Immediate</p>
-                  <p className="text-sm text-gray-600">Validity: Lifetime</p>
+                  <p className="text-sm text-gray-600">Type: Standard Shipping</p>
+                  <p className="text-sm text-gray-600">Status: Preparing</p>
+                  <p className="text-sm text-gray-600">Estimated Delivery: 3-5 Days</p>
                 </div>
               </div>
 
