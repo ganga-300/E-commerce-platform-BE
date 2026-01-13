@@ -27,17 +27,19 @@ function Navbar() {
     }
   };
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 bg-gray-200">
+    <div className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
 
-      <div className="flex items-center space-x-6">
-        <h1 style={{ fontFamily: 'TTRamillas' }} className="text-4xl font-bold text-black">
-          Study<span style={{ color: '#637D37' }}>Stuff</span>
-        </h1>
+      <div className="flex items-center space-x-12">
+        <Link href="/">
+          <h1 style={{ fontFamily: 'TTRamillas' }} className="text-3xl font-bold text-black cursor-pointer">
+            Study<span style={{ color: '#637D37' }}>Stuff</span>
+          </h1>
+        </Link>
 
-        <form onSubmit={(e) => { e.preventDefault(); router.push(`/search?query=${e.target.search.value}`); }} className="relative w-full max-w-md mx-auto">
-          <button type="submit" className="absolute inset-y-0 left-0 flex items-center pl-3">
+        <form onSubmit={(e) => { e.preventDefault(); router.push(`/search?query=${e.target.search.value}`); }} className="relative w-full max-w-sm mx-auto">
+          <button type="submit" className="absolute inset-y-0 left-0 flex items-center pl-4">
             <svg
-              className="h-5 w-5 text-gray-800"
+              className="h-4 w-4 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -54,58 +56,63 @@ function Navbar() {
           <input
             name="search"
             type="text"
-            placeholder="Search products"
-            className="pl-10 pr-4 py-2 h-10 w-full rounded-full bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:border-transparent"
+            placeholder="Search premium products..."
+            className="pl-10 pr-4 py-2 h-10 w-full rounded-xl bg-gray-50 border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#637D37]/20 focus:bg-white transition-all"
           />
         </form>
       </div>
 
-      <div className="flex items-center space-x-8 pr-6">
-        <Link href="/about" className="cursor-pointer px-4 py-1 hover:text-green-700">
-          About us
+      <div className="flex items-center space-x-8">
+        <Link href="/about" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
+          About
         </Link>
-
-
 
         <div className="relative">
           <button
             onClick={handleCartClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-all
-              ${totalItems > 0 ? 'bg-[#728f40]' : 'bg-gray-400'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white font-bold text-sm transition-all
+              ${totalItems > 0 ? 'bg-[#637D37] shadow-lg shadow-[#637D37]/20' : 'bg-gray-400'}`}
           >
-            <span>Cart ({totalItems})</span>
             <FiShoppingCart className="text-lg" />
+            <span>Cart ({totalItems})</span>
           </button>
         </div>
 
         {user ? (
-          <div className="flex items-center gap-4">
-            <span className="text-gray-700 font-medium">Hi, {user.userName}</span>
-            <Link href="/orders" className="text-gray-600 hover:text-[#637D37] font-medium transition-colors">
-              My Orders
-            </Link>
-            {user?.role?.toUpperCase() === "SELLER" && (
-              <Link href="/seller" className="text-gray-600 hover:text-[#637D37] font-medium transition-colors">
-                Seller Dashboard
+          <div className="flex items-center gap-6">
+            <div className="h-8 w-[1px] bg-gray-200"></div>
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-gray-400 font-medium">Account</span>
+              <span className="text-sm text-gray-800 font-bold">Hi, {user.userName}</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Link href="/orders" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
+                Orders
               </Link>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-            >
-              Logout
-            </button>
+              {user?.role?.toUpperCase() === "SELLER" && (
+                <Link href="/seller" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
+                  Dashboard
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-xs font-bold text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-all"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link href="/login">
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+              <button className="px-6 py-2 text-sm font-bold text-gray-700 hover:text-[#637D37] transition-colors">
                 Login
               </button>
             </Link>
             <Link href="/signup">
-              <button className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
-                Sign Up
+              <button className="px-6 py-2 text-sm font-bold text-white bg-black rounded-xl hover:bg-[#637D37] transition-all">
+                Join
               </button>
             </Link>
           </div>

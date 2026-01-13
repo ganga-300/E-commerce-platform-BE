@@ -1,12 +1,16 @@
 "use client";
 import React, { createContext, useContext, useState } from 'react';
+import { useToast } from './ToastContext';
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [quantity, setQuantity] = useState({});
+  const { showToast } = useToast();
 
   const addItem = (product) => {
+    const isExisting = !!quantity[product.name];
+
     setQuantity((prev) => {
       const existing = prev[product.name];
       if (existing) {
@@ -27,14 +31,25 @@ export function CartProvider({ children }) {
         };
       }
     });
+
+    if (isExisting) {
+      showToast(`Increased quantity of ${product.name}`);
+    } else {
+      showToast(`Added ${product.name} to cart`);
+    }
   };
 
   const removeItem = (name) => {
-    setQuantity((prev) => {
-      const existing = prev[name];
-      if (!existing) return prev;
+    const existing = quantity[name];
+    if (!existing) return;
 
-      const newQty = existing.qty - 1;
+    const willBeRemoved = existing.qty <= 1;
+
+    setQuantity((prev) => {
+      const item = prev[name];
+      if (!item) return prev;
+
+      const newQty = item.qty - 1;
       if (newQty <= 0) {
         const { [name]: _, ...rest } = prev;
         return rest;
@@ -43,11 +58,17 @@ export function CartProvider({ children }) {
       return {
         ...prev,
         [name]: {
-          ...existing,
+          ...item,
           qty: newQty,
         },
       };
     });
+
+    if (willBeRemoved) {
+      showToast(`Removed ${name} from cart`, 'error');
+    } else {
+      showToast(`Decreased quantity of ${name}`);
+    }
   };
 
 
