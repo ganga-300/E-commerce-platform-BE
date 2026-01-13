@@ -2,8 +2,9 @@ const { placeOrder, viewOrdersByUserId } = require("./service.js");
 
 async function placeUserOrder(req, res) {
   const { userId } = req.params;
+  const { items } = req.body; // Allow sending items from frontend
   try {
-    const order = await placeOrder(Number(userId));
+    const order = await placeOrder(userId, items);
     res.status(201).json({ message: "Order placed successfully", order });
   } catch (err) {
     console.error(err);
@@ -14,7 +15,7 @@ async function placeUserOrder(req, res) {
 async function getUserOrders(req, res) {
   const { userId } = req.params;
   try {
-    const orders = await viewOrdersByUserId(Number(userId));
+    const orders = await viewOrdersByUserId(userId);
     res.json(orders);
   } catch (err) {
     console.error(err);

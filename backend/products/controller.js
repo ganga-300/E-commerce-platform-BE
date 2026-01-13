@@ -1,5 +1,4 @@
-
-const { createProductsFromDB, searchProductsInDB, getProductsFromId } = require("./service.js");
+const { createProductsFromDB, searchProductsInDB, getProductsFromId, getProductsFromDB } = require("./service.js");
 
 async function createProducts(req, res) {
   try {
@@ -9,7 +8,7 @@ async function createProducts(req, res) {
     res.json(product)
 
   } catch (err) {
-    res.status(500).json({ message: "Error fetching product by ID" });
+    res.status(500).json({ message: "Error creating product" });
   }
 }
 
@@ -27,7 +26,7 @@ async function getIdProduct(req, res) {
   try {
     const { id } = req.params;
     const product = await getProductsFromId(id);
-    
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -50,5 +49,5 @@ async function getSearchProducts(req, res) {
   }
 }
 
-module.exports = { createProducts, getSearchProducts, getIdProduct ,getAllProducts};
+module.exports = { createProducts, getSearchProducts, getIdProduct, getAllProducts };
 
