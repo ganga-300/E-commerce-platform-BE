@@ -58,7 +58,7 @@ export default function Signup() {
             }
 
             // Backend does not return token on register, so redirect to login
-            router.push("/Login");
+            router.push("/login");
         } catch (err) {
             setError(err.message);
         } finally {
@@ -204,7 +204,7 @@ export default function Signup() {
                     <p className="text-sm text-gray-600">
                         Already have an account?{" "}
                         <Link
-                            href="/Login"
+                            href="/login"
                             className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out"
                         >
                             Sign in

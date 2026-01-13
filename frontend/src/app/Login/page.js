@@ -34,6 +34,15 @@ export default function Login() {
             }
 
             login(data.user, data.token);
+
+            // Redirect based on role or to home
+            const userRole = data.user?.role?.toUpperCase();
+
+            if (userRole === "SELLER") {
+                router.push("/seller");
+            } else {
+                router.push("/");
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -130,7 +139,7 @@ export default function Login() {
                     <p className="text-sm text-gray-600">
                         Don&apos;t have an account?{" "}
                         <Link
-                            href="/Signup"
+                            href="/signup"
                             className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out"
                         >
                             Sign up

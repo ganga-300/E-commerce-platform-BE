@@ -14,15 +14,21 @@ import {
   Truck,
   Star,
 } from "lucide-react"
-import Image from "next/image"
+import { useAuth } from "../../contexts/AuthContext"
+import { useCart } from "../../contexts/CartContext"
 
 export default function ProfessionalCheckout() {
+  const { user, token } = useAuth()
+  const { quantity: cart, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
   const [paymentStatus, setPaymentStatus] = useState("pending")
   const [timeLeft, setTimeLeft] = useState(600)
   const [orderNumber, setOrderNumber] = useState("")
   const [paymentVerified, setPaymentVerified] = useState(false)
   const router = useRouter()
+
+  const cartItems = Object.values(cart)
+  const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0)
 
 
   useEffect(() => {
@@ -50,25 +56,39 @@ export default function ProfessionalCheckout() {
     setCurrentStep(2)
   }
 
-  const handlePaymentComplete = () => {
-    // In a real app, you would verify payment with your backend here
-    // For now, we'll simulate a verification process
+  const handlePaymentComplete = async () => {
+    if (!user || !token) {
+      alert("Please login to complete payment")
+      router.push("/login")
+      return
+    }
+
     setPaymentStatus("processing")
 
-    // Simulate payment verification (replace with actual API call)
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/orders/place/${user.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          items: cartItems // Our backend now accepts this!
+        })
+      })
 
-
-      const paymentVerified = true
-
-      if (paymentVerified) {
-        setPaymentStatus("completed")
-        setCurrentStep(3)
-      } else {
-        setPaymentStatus("failed")
-
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.message || "Failed to place order")
       }
-    }, 3000)
+
+      setPaymentStatus("completed")
+      clearCart()
+      setCurrentStep(3)
+    } catch (err) {
+      alert(`Error: ${err.message}`)
+      setPaymentStatus("pending")
+    }
   }
 
   const copyUPIId = () => {
@@ -140,23 +160,26 @@ export default function ProfessionalCheckout() {
                 </h2>
                 <div className="space-y-4">
 
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                    <Image
-                      src="/placeholder.svg"
-                      alt="Study Material"
-                      width={80}
-                      height={80}
-                      className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-800 mb-1">Physics Notes - Class 12</h3>
-                      <p className="text-sm text-gray-600 mb-2">Complete NCERT Solutions</p>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#637D37] font-semibold">₹270 × 2</p>
-                        <p className="text-lg font-bold text-gray-800">₹540</p>
+                  {cartItems.map((item, index) => (
+                    <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="relative w-20 h-20 bg-white rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                          src={item.imageUrl || item.image || "/placeholder.svg"}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 mb-1">{item.name}</h3>
+                        <p className="text-sm text-gray-600 mb-2 truncate">{item.description}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-[#637D37] font-semibold">₹{item.price} × {item.qty}</p>
+                          <p className="text-lg font-bold text-gray-800">₹{item.price * item.qty}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
@@ -183,7 +206,7 @@ export default function ProfessionalCheckout() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Items Total</span>
-                    <span className="font-semibold">₹540</span>
+                    <span className="font-semibold">₹{totalAmount}</span>
                   </div>
                   <div className="flex justify-between text-green-600">
                     <span>Delivery</span>
@@ -196,7 +219,7 @@ export default function ProfessionalCheckout() {
                   <div className="border-t pt-3">
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total Amount</span>
-                      <span className="text-[#637D37]">₹540</span>
+                      <span className="text-[#637D37]">₹{totalAmount}</span>
                     </div>
                   </div>
                 </div>
@@ -270,7 +293,7 @@ export default function ProfessionalCheckout() {
                       </div>
                       <div>
                         <p className="text-gray-500">Amount</p>
-                        <p className="font-semibold text-[#637D37]">₹540</p>
+                        <p className="font-semibold text-[#637D37]">₹{totalAmount}</p>
                       </div>
                     </div>
                   </div>
@@ -343,7 +366,7 @@ export default function ProfessionalCheckout() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-800 mb-2">Payment Details</h4>
-                  <p className="text-sm text-gray-600">Amount Paid: ₹540</p>
+                  <p className="text-sm text-gray-600">Amount Paid: ₹{totalAmount}</p>
                   <p className="text-sm text-gray-600">Payment Method: UPI</p>
                   <p className="text-sm text-gray-600">Status: Completed</p>
                 </div>

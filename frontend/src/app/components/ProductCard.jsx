@@ -11,7 +11,7 @@ export default function ProductCard({ product }) {
     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition overflow-hidden w-full max-w-[260px]">
       <div className="relative w-full h-56 overflow-hidden cursor-pointer" onClick={() => window.location.href = `/product/${product.id}`}>
         <Image
-          src={product.image}
+          src={product.imageUrl || product.image || "/placeholder.svg"}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"

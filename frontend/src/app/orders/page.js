@@ -14,7 +14,7 @@ export default function MyOrders() {
 
     useEffect(() => {
         if (!authLoading && !user) {
-            router.push("/Login")
+            router.push("/login")
             return
         }
 

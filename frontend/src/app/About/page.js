@@ -1,7 +1,7 @@
-import HeroSection from "../AboutUs/components/HeroSection"
-import StorySection from "../AboutUs/components/StorySection"
-import PhilosophySection from "../AboutUs/components/PhilosophySection"
-import VisionSection from "../AboutUs/components/VisionSection"
+import HeroSection from "../about-us/components/HeroSection"
+import StorySection from "../about-us/components/StorySection"
+import PhilosophySection from "../about-us/components/PhilosophySection"
+import VisionSection from "../about-us/components/VisionSection"
 
 export default function AboutPage() {
   return (

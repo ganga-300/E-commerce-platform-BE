@@ -23,7 +23,7 @@ function Navbar() {
     if (user) {
       router.push('/cart');
     } else {
-      router.push('/Login');
+      router.push('/login');
     }
   };
   return (
@@ -34,8 +34,8 @@ function Navbar() {
           Study<span style={{ color: '#637D37' }}>Stuff</span>
         </h1>
 
-        <div className="relative w-full max-w-md mx-auto">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <form onSubmit={(e) => { e.preventDefault(); router.push(`/search?query=${e.target.search.value}`); }} className="relative w-full max-w-md mx-auto">
+          <button type="submit" className="absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
               className="h-5 w-5 text-gray-800"
               xmlns="http://www.w3.org/2000/svg"
@@ -50,17 +50,18 @@ function Navbar() {
                 d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1112.75 5.25a7.5 7.5 0 014.9 11.4z"
               />
             </svg>
-          </div>
+          </button>
           <input
+            name="search"
             type="text"
             placeholder="Search products"
-            className="pl-10 pr-4 py-2 h-10 w-100 rounded-full bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:border-transparent"
+            className="pl-10 pr-4 py-2 h-10 w-full rounded-full bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:border-transparent"
           />
-        </div>
+        </form>
       </div>
 
       <div className="flex items-center space-x-8 pr-6">
-        <Link href="/About" className="cursor-pointer px-4 py-1 hover:text-green-700">
+        <Link href="/about" className="cursor-pointer px-4 py-1 hover:text-green-700">
           About us
         </Link>
 
@@ -83,6 +84,11 @@ function Navbar() {
             <Link href="/orders" className="text-gray-600 hover:text-[#637D37] font-medium transition-colors">
               My Orders
             </Link>
+            {user?.role?.toUpperCase() === "SELLER" && (
+              <Link href="/seller" className="text-gray-600 hover:text-[#637D37] font-medium transition-colors">
+                Seller Dashboard
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
@@ -92,12 +98,12 @@ function Navbar() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link href="/Login">
+            <Link href="/login">
               <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
                 Login
               </button>
             </Link>
-            <Link href="/Signup">
+            <Link href="/signup">
               <button className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
                 Sign Up
               </button>
