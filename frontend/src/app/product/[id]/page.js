@@ -11,16 +11,25 @@ import {
     Shield,
     Package,
     Minus,
-    Plus
+    Plus,
+    Heart
 } from "lucide-react"
+import { useCart } from "@/contexts/CartContext"
+import { useWishlist } from "@/contexts/WishlistContext"
+import { useToast } from "@/contexts/ToastContext"
+import ReviewSection from "@/app/components/ReviewSection"
 
 export default function ProductDetails() {
     const { id } = useParams()
     const router = useRouter()
+    const { addItem } = useCart()
+    const { toggleWishlist, isInWishlist } = useWishlist()
+    const { showToast } = useToast()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [quantity, setQuantity] = useState(1)
+    const [localQty, setLocalQty] = useState(1)
     const [error, setError] = useState(null)
+    const isFavorited = product ? isInWishlist(product.id) : false
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -69,7 +78,7 @@ export default function ProductDetails() {
                         {/* Image Section */}
                         <div className="relative aspect-square lg:aspect-auto h-96 lg:h-full bg-gray-100 rounded-xl overflow-hidden">
                             <Image
-                                src={product.imageUrl || "/placeholder.svg"}
+                                src={product.imageUrl || "https://premium-stationery.com/placeholder.jpg"}
                                 alt={product.name}
                                 fill
                                 className="object-cover hover:scale-105 transition-transform duration-500"
@@ -85,7 +94,9 @@ export default function ProductDetails() {
                                     </span>
                                     <div className="flex items-center text-yellow-400">
                                         <Star className="w-4 h-4 fill-current" />
-                                        <span className="text-gray-600 ml-1 text-sm">4.8 (120 reviews)</span>
+                                        <span className="text-gray-600 ml-1 text-sm">
+                                            {product.averageRating || 0} ({product.reviewCount || 0} reviews)
+                                        </span>
                                     </div>
                                 </div>
 
@@ -113,14 +124,14 @@ export default function ProductDetails() {
                                     <span className="font-semibold text-gray-700">Quantity</span>
                                     <div className="flex items-center border border-gray-200 rounded-lg">
                                         <button
-                                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                            onClick={() => setLocalQty(Math.max(1, localQty - 1))}
                                             className="p-2 hover:bg-gray-50 text-gray-600 transition-colors"
                                         >
                                             <Minus className="w-4 h-4" />
                                         </button>
-                                        <span className="w-12 text-center font-medium text-gray-900">{quantity}</span>
+                                        <span className="w-12 text-center font-medium text-gray-900">{localQty}</span>
                                         <button
-                                            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                            onClick={() => setLocalQty(Math.min(product.stock, localQty + 1))}
                                             className="p-2 hover:bg-gray-50 text-gray-600 transition-colors"
                                         >
                                             <Plus className="w-4 h-4" />
@@ -132,10 +143,22 @@ export default function ProductDetails() {
                             <div className="flex gap-4">
                                 <button
                                     disabled={product.stock === 0}
+                                    onClick={() => {
+                                        for (let i = 0; i < localQty; i++) {
+                                            addItem(product);
+                                        }
+                                        showToast(`Added ${localQty} ${product.name} to cart`);
+                                    }}
                                     className="flex-1 bg-[#637D37] hover:bg-[#52682d] text-white py-4 px-8 rounded-xl font-bold text-lg shadow-lg shadow-[#637D37]/20 flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <ShoppingCart className="w-6 h-6" />
                                     Add to Cart
+                                </button>
+                                <button
+                                    onClick={() => toggleWishlist(product)}
+                                    className={`p-4 rounded-xl border transition-all transform hover:scale-105 ${isFavorited ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-gray-200 text-gray-400 hover:text-red-500'}`}
+                                >
+                                    <Heart className={`w-6 h-6 ${isFavorited ? 'fill-current' : ''}`} />
                                 </button>
                             </div>
 
@@ -158,6 +181,9 @@ export default function ProductDetails() {
                         </div>
                     </div>
                 </div>
+
+                {/* Review Section */}
+                <ReviewSection productId={id} />
             </div>
         </div>
     )

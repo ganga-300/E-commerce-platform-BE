@@ -11,6 +11,7 @@ export default function Signup() {
         password: "",
         confirmPassword: "",
         role: "Buyer",
+        phoneNumber: "",
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -48,6 +49,7 @@ export default function Signup() {
                     email: formData.email,
                     password: formData.password,
                     role: formData.role.toUpperCase(),
+                    phoneNumber: formData.phoneNumber,
                 }),
             });
 
@@ -130,8 +132,22 @@ export default function Signup() {
                             >
                                 <option value="Buyer">Buyer</option>
                                 <option value="Seller">Seller</option>
-                                <option value="Admin">Admin</option>
                             </select>
+                        </div>
+                        <div>
+                            <label htmlFor="phoneNumber" className="sr-only">
+                                Phone Number
+                            </label>
+                            <input
+                                id="phoneNumber"
+                                name="phoneNumber"
+                                type="tel"
+                                required
+                                className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/50 backdrop-blur-sm transition duration-200"
+                                placeholder="Phone Number (for Seller Verification)"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                            />
                         </div>
                         <div>
                             <label htmlFor="password" className="sr-only">

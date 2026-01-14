@@ -1,25 +1,36 @@
 "use client"
 import { useCart } from "@/contexts/CartContext"
+import { useWishlist } from "@/contexts/WishlistContext"
 import { Plus, Minus, Heart } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function ProductCard({ product }) {
   const { addItem, removeItem, quantity } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
+
   const count = quantity[product.name]?.qty || 0
+  const isFavorited = isInWishlist(product.id)
 
   return (
     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden w-full max-w-[260px] border border-gray-100/50">
       <Link href={`/product/${product.id}`} className="relative block w-full h-56 overflow-hidden cursor-pointer">
         <Image
-          src={product.imageUrl || product.image || "/placeholder.svg"}
+          src={product.imageUrl || product.image || "https://premium-stationery.com/placeholder.jpg"}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors duration-300"></div>
-        <button className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white shadow-sm transition-all transform hover:scale-110" onClick={(e) => e.preventDefault()}>
-          <Heart className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+        <button
+          className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white shadow-sm transition-all transform hover:scale-110 z-10"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product);
+          }}
+        >
+          <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
         </button>
       </Link>
 

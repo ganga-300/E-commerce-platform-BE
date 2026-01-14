@@ -5,6 +5,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { FiShoppingCart } from "react-icons/fi"
+import { Heart } from "lucide-react"
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -67,6 +68,11 @@ function Navbar() {
           About
         </Link>
 
+        <Link href="/wishlist" className="text-sm font-semibold text-gray-600 hover:text-red-500 transition-colors flex items-center gap-1">
+          <Heart className="w-4 h-4" />
+          Wishlist
+        </Link>
+
         <div className="relative">
           <button
             onClick={handleCartClick}
@@ -87,12 +93,20 @@ function Navbar() {
             </div>
 
             <div className="flex items-center gap-4">
+              <Link href="/profile" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
+                Profile
+              </Link>
               <Link href="/orders" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
                 Orders
               </Link>
               {user?.role?.toUpperCase() === "SELLER" && (
                 <Link href="/seller" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
-                  Dashboard
+                  Seller Dashboard
+                </Link>
+              )}
+              {user?.role?.toUpperCase() === "ADMIN" && (
+                <Link href="/admin" className="text-sm font-semibold text-[#637D37] font-bold hover:scale-105 transition-all">
+                  Admin Dashboard
                 </Link>
               )}
               <button

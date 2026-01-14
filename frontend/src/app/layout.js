@@ -5,6 +5,7 @@ import Footer from "./features/shared/components/Footer";
 import { CartProvider } from '../contexts/CartContext.js';
 import { AuthProvider } from '../contexts/AuthContext.js';
 import { ToastProvider } from '../contexts/ToastContext.js';
+import { WishlistProvider } from '../contexts/WishlistContext.js';
 
 
 
@@ -30,11 +31,13 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <ToastProvider>
-            <CartProvider>
-              <Navbar />
-              {children}
-              <Footer />
-            </CartProvider>
+            <WishlistProvider>
+              <CartProvider>
+                <Navbar />
+                {children}
+                <Footer />
+              </CartProvider>
+            </WishlistProvider>
           </ToastProvider>
         </AuthProvider>
       </body>
