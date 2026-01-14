@@ -41,9 +41,19 @@ export default function ProfessionalCheckout() {
 
 
   useEffect(() => {
-    setOrderNumber(`SS${Date.now().toString().slice(-6)}`)
-  }, [])
+    // Dynamically load Razorpay script
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.async = true
+    document.body.appendChild(script)
 
+    // Set Order Number
+    setOrderNumber(`SS${Date.now().toString().slice(-6)}`)
+
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
 
   useEffect(() => {
     if (currentStep === 3 && paymentStatus === "pending" && timeLeft > 0) {
@@ -84,26 +94,108 @@ export default function ProfessionalCheckout() {
     setPaymentStatus("processing")
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/orders/place/${user.id}`, {
+      // 1. Create Razorpay Order in Backend
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const endpoint = `${apiUrl}/api/payment/create-order`;
+
+      console.log("DEBUG: Calling Create Order", {
+        url: endpoint,
+        method: "POST",
+        tokenBefore: token ? "Present (Starts with " + token.substring(0, 10) + "...)" : "Missing",
+        body: {
+          amount: totalAmount,
+          currency: "INR",
+          receipt: orderNumber
+        }
+      });
+
+      const orderResponse = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          items: cartItems,
-          shippingDetails: address
+          amount: totalAmount,
+          currency: "INR",
+          receipt: orderNumber
         })
       })
 
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.message || "Failed to place order")
+      if (!orderResponse.ok) throw new Error("Failed to create payment order")
+      const rzpOrder = await orderResponse.json()
+
+      // 2. Open Razorpay Checkout Modal
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
+        amount: rzpOrder.amount,
+        currency: rzpOrder.currency,
+        name: "StudyStuff",
+        description: "Premium Stationery Purchase",
+        order_id: rzpOrder.id,
+        handler: async (response) => {
+          // 3. Verify Payment Signature
+          const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/payment/verify`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          })
+
+          const verifyData = await verifyRes.json()
+
+          if (verifyData.success) {
+            // 4. Place Actual Order in Database
+            const placeOrderRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/orders/place/${user.id}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                items: cartItems,
+                shippingDetails: address,
+                paymentDetails: {
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id
+                }
+              })
+            })
+
+            if (placeOrderRes.ok) {
+              setPaymentStatus("completed")
+              clearCart()
+              setCurrentStep(4)
+            } else {
+              throw new Error("Payment verified but order placement failed")
+            }
+          } else {
+            throw new Error("Payment verification failed")
+          }
+        },
+        prefill: {
+          name: address.name,
+          email: user.email,
+          contact: address.phone
+        },
+        theme: {
+          color: "#637D37"
+        }
       }
 
-      setPaymentStatus("completed")
-      clearCart()
-      setCurrentStep(4)
+      const rzp1 = new window.Razorpay(options)
+      rzp1.on('payment.failed', function (response) {
+        alert(response.error.description);
+        setPaymentStatus("pending")
+      });
+      rzp1.open()
+
     } catch (err) {
       alert(`Error: ${err.message}`)
       setPaymentStatus("pending")
@@ -370,90 +462,48 @@ export default function ProfessionalCheckout() {
             <div className="bg-white rounded-xl p-8 shadow-sm border text-center">
               {paymentStatus === "pending" && (
                 <>
-                  <div className="mb-6">
-                    <div className="w-16 h-16 bg-[#637D37]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <QrCode className="w-8 h-8 text-[#637D37]" />
+                  <div className="mb-8">
+                    <div className="w-20 h-20 bg-[#637D37]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Shield className="w-10 h-10 text-[#637D37]" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Scan QR to Pay</h2>
-                    <p className="text-gray-600">Complete your payment using any UPI app</p>
+                    <h2 className="text-2xl font-black text-gray-900 mb-2">Secure Payment Gateway</h2>
+                    <p className="text-gray-500 font-medium">You are about to be redirected to our secure Razorpay portal.</p>
                   </div>
 
-
-                  <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                    <div className="flex items-center justify-center gap-2 text-orange-700">
-                      <Clock className="w-5 h-5" />
-                      <span className="font-semibold">Time remaining: {formatTime(timeLeft)}</span>
+                  <div className="bg-gray-50 rounded-3xl p-8 mb-8 border border-gray-100">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Order Reference</span>
+                      <span className="text-gray-900 font-black">{orderNumber}</span>
                     </div>
-                  </div>
-
-
-                  <div className="mb-6">
-                    <div className="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-gray-300 inline-block">
-                      <Image
-                        src="/placeholder.svg"
-                        alt="Payment QR Code"
-                        width={200}
-                        height={200}
-                        className="w-48 h-48 mx-auto"
-                      />
+                    <div className="flex justify-between items-center pb-4 border-b border-gray-200 mb-4">
+                      <span className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Items Count</span>
+                      <span className="text-gray-900 font-black">{cartItems.length} Products</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-900 font-black text-lg">Total Payable</span>
+                      <span className="text-[#637D37] font-black text-2xl">₹{totalAmount}</span>
                     </div>
                   </div>
 
-
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500">UPI ID</p>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">ganga@upi</span>
-                          <button onClick={copyUPIId} className="p-1 hover:bg-gray-200 rounded">
-                            <Copy className="w-4 h-4 text-gray-500" />
-                          </button>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Name</p>
-                        <p className="font-semibold">Ganga Raghuwanshi</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Amount</p>
-                        <p className="font-semibold text-[#637D37]">₹{totalAmount}</p>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <div className="text-left bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                      <Smartphone className="w-4 h-4" />
-                      How to pay:
-                    </h3>
-                    <ol className="text-sm text-blue-700 space-y-1">
-                      <li>1. Open any UPI app (GPay, PhonePe, Paytm, etc.)</li>
-                      <li>2. Scan the QR code above</li>
-                      <li>3. Verify the amount and merchant details</li>
-                      <li>4. Complete the payment</li>
-                    </ol>
-                  </div>
-
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <button
                       onClick={handlePaymentComplete}
                       disabled={paymentStatus === "processing"}
-                      className="w-full bg-[#637D37] hover:bg-[#4a5a2a] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors mb-4"
+                      className="w-full bg-[#637D37] hover:bg-[#4a5a2a] disabled:bg-gray-200 disabled:cursor-not-allowed text-white font-black py-5 rounded-2xl shadow-xl shadow-[#637D37]/20 hover:shadow-[#637D37]/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group"
                     >
-                      {paymentStatus === "processing" ? "VERIFYING PAYMENT..." : "I HAVE COMPLETED THE PAYMENT"}
+                      {paymentStatus === "processing" ? (
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      )}
+                      {paymentStatus === "processing" ? "VERIFYING SECURELY..." : "SECURELY PAY WITH RAZORPAY"}
                     </button>
 
-                    <p className="text-xs text-gray-500 text-center">
-                      Click only after completing the UPI payment. We&apos;ll verify your transaction automatically.
+                    <p className="text-[11px] text-gray-400 font-medium text-center flex items-center justify-center gap-1.5">
+                      <Shield className="w-3 h-3" />
+                      128-bit SSL Encrypted secure transaction. No card details are stored.
                     </p>
                   </div>
-
-                  <button className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1 mx-auto">
-                    <RefreshCw className="w-4 h-4" />
-                    Refresh QR Code
-                  </button>
                 </>
               )}
 
