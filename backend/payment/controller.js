@@ -8,11 +8,13 @@ const razorpay = new Razorpay({
 });
 
 exports.createOrder = async (req, res) => {
+    console.log("DEBUG: createOrder called with body:", req.body);
     try {
         const { amount, currency = "INR", receipt } = req.body;
 
-        if (!amount) {
-            return res.status(400).json({ message: "Amount is required" });
+        if (amount === undefined || amount === null || amount <= 0) {
+            console.error("DEBUG: Invalid amount received:", amount);
+            return res.status(400).json({ message: "Invalid amount. Amount must be greater than 0." });
         }
 
         const options = {
