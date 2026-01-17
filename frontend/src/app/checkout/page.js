@@ -100,6 +100,11 @@ export default function ProfessionalCheckout() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const endpoint = `${apiUrl}/api/payment/create-order`;
 
+      // 0. Validate totalAmount
+      if (!totalAmount || totalAmount <= 0) {
+        throw new Error("Cart is empty or total amount is 0. Please add items to your cart.");
+      }
+
       console.log("DEBUG: Calling Create Order", {
         url: endpoint,
         method: "POST",
