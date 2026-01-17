@@ -9,16 +9,40 @@ datasource db {
 }
 
 model User {
+  id             String   @id @default(cuid())
+  userName       String
+  email          String   @unique
+  password       String
+  role           Role
+  profilePicture String?
+  phoneNumber    String?
+  isApproved     Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  orders    Order[]
+  products  Product[] @relation("SellerProducts")
+  carts     Cart[]
+  wishlists Wishlist[]
+  reviews   Review[]
+  addresses Address[]
+}
+
+model Address {
   id        String   @id @default(cuid())
-  userName  String
-  email     String   @unique
-  password  String
-  role      Role
+  userId    String
+  title     String   // e.g. "Home", "Work"
+  name      String
+  phone     String
+  address   String   // Street address
+  city      String
+  state     String
+  zip       String
+  isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orders Order[]
-  carts  Cart[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
@@ -28,19 +52,27 @@ enum Role {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  stock       Int
-  sku         String   @unique
-  family      String?
-  imageUrl    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  price         Float
+  stock         Int
+  sku           String   @unique
+  family        String?
+  imageUrl      String
+  categoryId    String?
+  averageRating Float?   @default(0)
+  reviewCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  sellerId      String?
+  seller        User?     @relation("SellerProducts", fields: [sellerId], references: [id])
+  category   Category?   @relation(fields: [categoryId], references: [id])
   carts      Cart[]
   orderItems OrderItem[]
+  wishlists  Wishlist[]
+  reviews    Review[]
 }
 
 model Cart {
@@ -57,14 +89,24 @@ model Cart {
 }
 
 model Order {
-  id          String    @id @default(cuid())
-  userId      String
-  status      String    @default("Pending")
-  createdAt   DateTime  @default(now())
-  deliveredAt DateTime?
+  id              String    @id @default(cuid())
+  userId          String
+  status          String    @default("Pending")
+  shippingAddress String?
+  city            String?
+  state           String?
+  zip             String?
+  phoneNumber     String?
+  totalAmount     Float     @default(0.0)
+  trackingNumber  String?
+  razorpayOrderId  String?
+  razorpayPaymentId String?
+  createdAt       DateTime  @default(now())
+  deliveredAt     DateTime?
 
-  user       User        @relation(fields: [userId], references: [id])
-  orderItems OrderItem[]
+  user          User                 @relation(fields: [userId], references: [id])
+  orderItems    OrderItem[]
+  statusHistory OrderStatusHistory[]
 }
 
 model OrderItem {
@@ -78,8 +120,60 @@ model OrderItem {
   product Product @relation(fields: [productId], references: [id])
 }
 
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
 model Invoice {
   id      String @id @default(cuid())
   orderId String
   link    String
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  title     String
+  comment   String
+  verified  Boolean  @default(false)
+  helpful   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([productId, userId])
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

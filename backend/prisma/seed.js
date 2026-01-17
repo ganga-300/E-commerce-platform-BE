@@ -1,5 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
 const prisma = new PrismaClient();
+
+const bcrypt = require('bcryptjs');
 
 const products = [
     {
@@ -51,6 +54,28 @@ const products = [
 
 async function main() {
     console.log('Start seeding ...');
+
+    // Seed Admin if provided in .env
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminEmail && adminPassword) {
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        await prisma.user.upsert({
+            where: { email: adminEmail },
+            update: {},
+            create: {
+                userName: "SuperAdmin",
+                email: adminEmail,
+                password: hashedPassword,
+                role: "ADMIN",
+                isApproved: true
+            },
+        });
+        console.log(`Admin user ${adminEmail} seeded successfully.`);
+    }
+
+    // Seed Products
     for (const p of products) {
         const product = await prisma.product.upsert({
             where: { sku: p.sku },

@@ -6,10 +6,10 @@ const {
 
 
 const registerUser = async (req, res) => {
-  const { userName, email, password, role } = req.body;
+  const { userName, email, password, role, phoneNumber, profilePicture } = req.body;
 
   try {
-    const user = await handleSignup({ userName, email, password, role })
+    const user = await handleSignup({ userName, email, password, role, phoneNumber, profilePicture })
     return res.status(201).json({
       message: "User registered successfully",
       user: {

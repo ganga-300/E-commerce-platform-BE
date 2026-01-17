@@ -2,12 +2,27 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 
-async function placeOrder(userId, items) {
+async function placeOrder(userId, items, shippingDetails = {}, paymentDetails = {}) {
   let orderItemsData = [];
+  const { address, city, state, zip, phone } = shippingDetails;
+  const { razorpayOrderId, razorpayPaymentId } = paymentDetails;
 
   if (items && items.length > 0) {
-    // If items are sent directly from frontend (simpler for interview)
-    const order = await prisma.order.create({ data: { userId, status: "Pending" } });
+    const total = items.reduce((sum, item) => sum + (item.price * (item.qty || item.quantity)), 0);
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        status: "Paid", // Marking as Paid since this is called after verification
+        shippingAddress: address,
+        city,
+        state,
+        zip,
+        phoneNumber: phone,
+        totalAmount: total,
+        razorpayOrderId,
+        razorpayPaymentId
+      }
+    });
     orderItemsData = items.map(item => ({
       orderId: order.id,
       productId: item.id || item.productId,
@@ -15,6 +30,15 @@ async function placeOrder(userId, items) {
       price: item.price,
     }));
     await prisma.orderItem.createMany({ data: orderItemsData });
+
+    // Decrease stock
+    for (const item of orderItemsData) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } }
+      });
+    }
+
     return order;
   } else {
     // Existing logic for DB-level cart items
@@ -25,7 +49,20 @@ async function placeOrder(userId, items) {
 
     if (cartItems.length === 0) throw new Error("Cart is empty");
 
-    const order = await prisma.order.create({ data: { userId, status: "Pending" } });
+    const total = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        status: "Pending",
+        shippingAddress: address,
+        city,
+        state,
+        zip,
+        phoneNumber: phone,
+        totalAmount: total
+      }
+    });
     orderItemsData = cartItems.map(item => ({
       orderId: order.id,
       productId: item.productId,
@@ -34,6 +71,15 @@ async function placeOrder(userId, items) {
     }));
 
     await prisma.orderItem.createMany({ data: orderItemsData });
+
+    // Decrease stock
+    for (const item of orderItemsData) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } }
+      });
+    }
+
     await prisma.cart.deleteMany({ where: { userId } });
     return order;
   }
