@@ -7,7 +7,7 @@ export default function VisionSection() {
             <div className="relative order-2 lg:order-1">
               <div className="aspect-[5/4] bg-accent/5 rounded-lg overflow-hidden">
                 <img
-                  src="/elegant-stationery-flat-lay-with-sage-green-theme-.jpg"
+                  src="/fountain-pen-collection-luxury-sage-green.jpg"
                   alt="Premium stationery arrangement"
                   className="w-full h-full object-cover"
                 />
