@@ -128,8 +128,13 @@ export default function ProfessionalCheckout() {
       const rzpOrder = await orderResponse.json()
 
       // 2. Open Razorpay Checkout Modal
+      const rzpKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!rzpKeyId || rzpKeyId === "rzp_test_placeholder") {
+        throw new Error("Razorpay Key ID is not configured. Please contact support or check environment variables.");
+      }
+
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
+        key: rzpKeyId,
         amount: rzpOrder.amount,
         currency: rzpOrder.currency,
         name: "StudyStuff",
