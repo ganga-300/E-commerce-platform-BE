@@ -36,7 +36,6 @@
     "tw-animate-css": "^1.3.4"
   },
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ganga-300/E-commerce-platform.git"
