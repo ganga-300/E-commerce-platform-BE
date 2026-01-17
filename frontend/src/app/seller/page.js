@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail } from "lucide-react"
+import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package } from "lucide-react"
 import Script from "next/script"
 
 export default function SellerDashboard() {
@@ -18,10 +18,25 @@ export default function SellerDashboard() {
     const [showEditModal, setShowEditModal] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [productToDelete, setProductToDelete] = useState(null)
+    const [analytics, setAnalytics] = useState(null)
+
+    const fetchAnalytics = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/seller/analytics`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setAnalytics(data)
+            }
+        } catch (err) {
+            console.error("Error fetching analytics:", err)
+        }
+    }
 
     const fetchMyProducts = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`)
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products?sellerId=${user?.id}`)
             if (!res.ok) {
                 const errorData = await res.json()
                 throw new Error(errorData.message || "Could not load products")
@@ -45,6 +60,7 @@ export default function SellerDashboard() {
                 setIsApproved(data.user.isApproved);
                 if (data.user.isApproved) {
                     fetchMyProducts();
+                    fetchAnalytics();
                 }
             }
         } catch (err) {
@@ -317,7 +333,94 @@ export default function SellerDashboard() {
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="afterInteractive" />
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-6xl mx-auto">
+                {/* Analytics Section */}
+                {analytics && (
+                    <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-3xl font-black text-gray-900 tracking-tight">Sales Overview</h1>
+                                <p className="text-gray-500 font-medium">Performance for {analytics.period.month} {analytics.period.year}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-sm border border-emerald-100 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4" />
+                                    Live Data
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-lg transition-all">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#637D37]/10 rounded-full translate-x-10 -translate-y-10 blur-2xl group-hover:bg-[#637D37]/20 transition-all"></div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-3 mb-4 text-[#637D37]">
+                                        <div className="p-3 bg-[#637D37]/10 rounded-xl">
+                                            <DollarSign className="w-6 h-6" />
+                                        </div>
+                                        <span className="font-bold text-sm uppercase tracking-wider">Total Revenue</span>
+                                    </div>
+                                    <div className="text-4xl font-black text-gray-900 tracking-tighter">
+                                        ₹{analytics.summary.totalRevenue.toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-lg transition-all">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full translate-x-10 -translate-y-10 blur-2xl group-hover:bg-blue-100 transition-all"></div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-3 mb-4 text-blue-600">
+                                        <div className="p-3 bg-blue-50 rounded-xl">
+                                            <Package className="w-6 h-6" />
+                                        </div>
+                                        <span className="font-bold text-sm uppercase tracking-wider">Units Sold</span>
+                                    </div>
+                                    <div className="text-4xl font-black text-gray-900 tracking-tighter">
+                                        {analytics.summary.totalUnits}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Product Performance Table */}
+                        <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="p-8 border-b border-gray-50">
+                                <h2 className="text-xl font-bold text-gray-900">Product Performance</h2>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-50/50">
+                                        <tr>
+                                            <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">Product</th>
+                                            <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-wider">SKU</th>
+                                            <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-wider text-right">Units Sold</th>
+                                            <th className="px-8 py-4 text-xs font-black text-gray-400 uppercase tracking-wider text-right">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {analytics.products.length > 0 ? (
+                                            analytics.products.map((product) => (
+                                                <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <td className="px-8 py-6 font-bold text-gray-900">{product.name}</td>
+                                                    <td className="px-8 py-6 text-sm font-medium text-gray-500">{product.sku}</td>
+                                                    <td className="px-8 py-6 text-sm font-bold text-gray-900 text-right">{product.unitsSold}</td>
+                                                    <td className="px-8 py-6 text-sm font-bold text-[#637D37] text-right">₹{product.revenue.toLocaleString()}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" className="px-8 py-12 text-center text-gray-400 font-medium italic">
+                                                    No sales recorded this month yet.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
                     <PlusCircle className="w-8 h-8 text-[#637D37]" />
                     Add New Product

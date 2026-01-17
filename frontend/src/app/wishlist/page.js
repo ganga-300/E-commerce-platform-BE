@@ -13,7 +13,9 @@ export default function WishlistPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="mb-12">
                     <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                        <Heart className="w-10 h-10 text-red-500 fill-red-500" />
+                        <div className="p-3 bg-[#637D37]/10 rounded-2xl">
+                            <Heart className="w-8 h-8 text-[#637D37]" />
+                        </div>
                         My Wishlist
                     </h1>
                     <p className="mt-2 text-gray-500">Products you've saved to buy later</p>

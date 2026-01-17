@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
             toggleWishlist(product);
           }}
         >
-          <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+          <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-[#637D37] text-[#637D37]' : 'text-gray-400'}`} />
         </button>
       </Link>
 

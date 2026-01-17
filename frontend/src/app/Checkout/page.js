@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
 import { useCart } from "../../contexts/CartContext"
+import { indianStates } from "../../data/indianStates"
 
 export default function ProfessionalCheckout() {
   const { user, token } = useAuth()
@@ -28,6 +29,7 @@ export default function ProfessionalCheckout() {
     address: "",
     city: "",
     state: "",
+    district: "",
     zip: ""
   })
   const [paymentStatus, setPaymentStatus] = useState("pending")
@@ -77,8 +79,8 @@ export default function ProfessionalCheckout() {
 
   const handleProceedToPayment = () => {
     // Validate address
-    if (!address.address || !address.city || !address.phone) {
-      alert("Please fill in the required shipping details")
+    if (!address.address || !address.city || !address.state || !address.district || !address.phone || !address.zip) {
+      alert("Please fill in all required shipping details")
       return
     }
     setCurrentStep(3)
@@ -160,7 +162,10 @@ export default function ProfessionalCheckout() {
               },
               body: JSON.stringify({
                 items: cartItems,
-                shippingDetails: address,
+                shippingDetails: {
+                  ...address,
+                  address: `${address.address}, District: ${address.district}` // Append district to address line
+                },
                 paymentDetails: {
                   razorpayOrderId: response.razorpay_order_id,
                   razorpayPaymentId: response.razorpay_payment_id
@@ -402,15 +407,33 @@ export default function ProfessionalCheckout() {
                       placeholder="City"
                     />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none"
+                    <select
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none bg-white"
                       value={address.state}
-                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                      placeholder="State"
-                    />
+                      onChange={(e) => setAddress({ ...address, state: e.target.value, district: "" })}
+                    >
+                      <option value="">Select State</option>
+                      {Object.keys(indianStates).map((state) => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+                    <select
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#637D37] outline-none bg-white"
+                      value={address.district}
+                      onChange={(e) => setAddress({ ...address, district: e.target.value })}
+                      disabled={!address.state}
+                    >
+                      <option value="">Select District</option>
+                      {address.state && indianStates[address.state]?.map((district) => (
+                        <option key={district} value={district}>{district}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
@@ -582,6 +605,6 @@ export default function ProfessionalCheckout() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }

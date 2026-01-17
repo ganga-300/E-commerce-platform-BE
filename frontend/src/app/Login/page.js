@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Mail, Lock, ArrowRight, Loader2, Sparkles } from "lucide-react";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -51,100 +52,117 @@ export default function Login() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-8 bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl">
-                <div className="text-center">
-                    <h2 className="text-3xl font-extrabold text-gray-900">
-                        Welcome Back
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Sign in to your account
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    {error && (
-                        <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
-                            {error}
+        <div className="min-h-screen flex items-center justify-center bg-[#FDFCF8] relative overflow-hidden">
+            {/* Abstract background elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-[#637D37]/5 blur-3xl"></div>
+                <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-[#637D37]/3 blur-3xl"></div>
+            </div>
+
+            <div className="w-full max-w-md p-8 relative z-10">
+                <div className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl shadow-gray-100/50 p-10">
+                    <div className="mb-10 text-center">
+                        <div className="w-16 h-16 bg-[#637D37] text-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#637D37]/20 transform rotate-3">
+                            <Sparkles className="w-8 h-8" />
                         </div>
-                    )}
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="sr-only">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/50 backdrop-blur-sm transition duration-200"
-                                placeholder="Email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/50 backdrop-blur-sm transition duration-200"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
+                            Welcome Back
+                        </h2>
+                        <p className="text-gray-500 font-medium">
+                            Enter your credentials to continue
+                        </p>
                     </div>
 
-                    <div>
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="p-4 text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-xl animate-in fade-in slide-in-from-top-2">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#637D37] transition-colors">
+                                    <Mail className="w-5 h-5" />
+                                </div>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    className="block w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#637D37]/20 focus:border-[#637D37] transition-all font-medium"
+                                    placeholder="Email address"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-[#637D37] transition-colors">
+                                    <Lock className="w-5 h-5" />
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    className="block w-full pl-12 pr-4 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#637D37]/20 focus:border-[#637D37] transition-all font-medium"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <input
+                                    id="remember-me"
+                                    name="remember-me"
+                                    type="checkbox"
+                                    className="h-4 w-4 text-[#637D37] focus:ring-[#637D37] border-gray-300 rounded cursor-pointer"
+                                />
+                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-500 cursor-pointer">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            <div className="text-sm">
+                                <a href="#" className="font-bold text-[#637D37] hover:text-[#4d612b] transition-colors">
+                                    Forgot password?
+                                </a>
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg transform hover:-translate-y-0.5 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent text-lg font-bold rounded-xl text-white bg-[#637D37] hover:bg-[#52682d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#637D37] shadow-xl shadow-[#637D37]/20 transform hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading ? (
-                                <svg
-                                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                </svg>
+                                <Loader2 className="animate-spin w-6 h-6" />
                             ) : (
-                                "Sign in"
+                                <>
+                                    Sign In
+                                    <ArrowRight className="w-5 h-5" />
+                                </>
                             )}
                         </button>
+                    </form>
+
+                    <div className="mt-8 text-center">
+                        <p className="text-gray-500">
+                            Don&apos;t have an account?{" "}
+                            <Link
+                                href="/signup"
+                                className="font-bold text-[#637D37] hover:text-[#4d612b] transition-colors"
+                            >
+                                Create Account
+                            </Link>
+                        </p>
                     </div>
-                </form>
-                <div className="text-center">
-                    <p className="text-sm text-gray-600">
-                        Don&apos;t have an account?{" "}
-                        <Link
-                            href="/signup"
-                            className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out"
-                        >
-                            Sign up
-                        </Link>
-                    </p>
                 </div>
             </div>
         </div>

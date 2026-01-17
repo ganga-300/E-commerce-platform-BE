@@ -1,279 +1,345 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2, Camera, ShieldCheck } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { User, MapPin, Plus, Trash2, Home, Briefcase, CheckCircle, Loader2 } from "lucide-react"
 
 export default function ProfilePage() {
-    const { user, token, loading: authLoading } = useAuth()
+    const { user, token, logout } = useAuth()
     const router = useRouter()
-    const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState("")
-    const [error, setError] = useState("")
-
-    // Profile State
-    const [userName, setUserName] = useState("")
-    const [email, setEmail] = useState("")
-    const [phoneNumber, setPhoneNumber] = useState("")
-    const [profilePicture, setProfilePicture] = useState("")
-
-    // Password State
-    const [currentPassword, setCurrentPassword] = useState("")
-    const [newPassword, setNewPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [showPasswords, setShowPasswords] = useState(false)
+    const [activeTab, setActiveTab] = useState("profile")
+    const [addresses, setAddresses] = useState([])
+    const [loadingAddresses, setLoadingAddresses] = useState(false)
+    const [showAddModal, setShowAddModal] = useState(false)
+    const [newAddress, setNewAddress] = useState({
+        title: "Home",
+        name: "",
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        zip: "",
+        isDefault: false
+    })
 
     useEffect(() => {
-        if (!authLoading) {
-            if (!user) {
-                router.push("/login")
-                return
-            }
-            setUserName(user.userName || "")
-            setEmail(user.email || "")
-            setPhoneNumber(user.phoneNumber || "")
-            setProfilePicture(user.profilePicture || "")
+        if (!user) {
+            router.push("/login")
+            return
         }
-    }, [user, authLoading])
+        if (activeTab === "addresses") {
+            fetchAddresses()
+        }
+    }, [user, activeTab])
 
-    const handleUpdateProfile = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        setMessage("")
-        setError("")
-
+    const fetchAddresses = async () => {
+        setLoadingAddresses(true)
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/users/profile`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ userName, phoneNumber, profilePicture })
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/user/address`, {
+                headers: { Authorization: `Bearer ${token}` }
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.message || "Failed to update profile")
-
-            setMessage("Profile updated successfully!")
-            // In a real app, you'd update the AuthContext user here too
-        } catch (err) {
-            setError(err.message)
+            if (res.ok) {
+                const data = await res.json()
+                setAddresses(data)
+            }
+        } catch (error) {
+            console.error("Failed to fetch addresses", error)
         } finally {
-            setLoading(false)
+            setLoadingAddresses(false)
         }
     }
 
-    const handleChangePassword = async (e) => {
+    const handleAddAddress = async (e) => {
         e.preventDefault()
-        if (newPassword !== confirmPassword) {
-            setError("New passwords do not match")
-            return
-        }
-
-        setLoading(true)
-        setMessage("")
-        setError("")
-
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/users/change-password`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/user/address`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ currentPassword, newPassword })
+                body: JSON.stringify(newAddress)
             })
 
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.message || "Failed to change password")
-
-            setMessage("Password changed successfully!")
-            setCurrentPassword("")
-            setNewPassword("")
-            setConfirmPassword("")
-        } catch (err) {
-            setError(err.message)
-        } finally {
-            setLoading(false)
+            if (res.ok) {
+                setShowAddModal(false)
+                fetchAddresses()
+                setNewAddress({
+                    title: "Home",
+                    name: "",
+                    phone: "",
+                    address: "",
+                    city: "",
+                    state: "",
+                    zip: "",
+                    isDefault: false
+                })
+            }
+        } catch (error) {
+            alert("Failed to add address")
         }
     }
 
-    if (authLoading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <Loader2 className="animate-spin text-[#637D37] w-12 h-12" />
-        </div>
-    )
+    const handleDeleteAddress = async (id) => {
+        if (!confirm("Are you sure you want to delete this address?")) return
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/user/address/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            })
+
+            if (res.ok) {
+                fetchAddresses()
+            }
+        } catch (error) {
+            alert("Failed to delete address")
+        }
+    }
+
+    if (!user) return null
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-6">
+        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                <header className="mb-10">
-                    <h1 className="text-4xl font-black text-gray-900">Your Profile</h1>
-                    <p className="text-gray-500 font-medium">Manage your personal information and security.</p>
-                </header>
+                <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
 
-                {message && (
-                    <div className="mb-8 p-4 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-2xl font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
-                        <ShieldCheck className="w-5 h-5" />
-                        {message}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+                    {/* Sidebar */}
+                    <div className="w-full md:w-64 bg-gray-50 border-r border-gray-100 p-6">
+                        <div className="flex flex-col items-center mb-8">
+                            <div className="w-20 h-20 bg-[#637D37]/10 rounded-full flex items-center justify-center text-[#637D37] text-2xl font-bold mb-3">
+                                {user.userName?.charAt(0).toUpperCase()}
+                            </div>
+                            <h2 className="font-bold text-gray-900">{user.userName}</h2>
+                            <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+
+                        <nav className="space-y-2">
+                            <button
+                                onClick={() => setActiveTab("profile")}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === "profile" ? "bg-[#637D37] text-white" : "text-gray-600 hover:bg-gray-200"
+                                    }`}
+                            >
+                                <User className="w-5 h-5" />
+                                Profile Info
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("addresses")}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === "addresses" ? "bg-[#637D37] text-white" : "text-gray-600 hover:bg-gray-200"
+                                    }`}
+                            >
+                                <MapPin className="w-5 h-5" />
+                                Addresses
+                            </button>
+                        </nav>
+
+                        <button
+                            onClick={logout}
+                            className="w-full mt-8 flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                            Logout
+                        </button>
                     </div>
-                )}
 
-                {error && (
-                    <div className="mb-8 p-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl font-bold animate-in fade-in slide-in-from-top-4">
-                        {error}
-                    </div>
-                )}
+                    {/* Content */}
+                    <div className="flex-1 p-8">
+                        {activeTab === "profile" && (
+                            <div className="space-y-6 animate-in fade-in duration-500">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-6">Personal Information</h2>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Profile Section */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                            <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                                <User className="w-6 h-6 text-[#637D37]" />
-                                Public Profile
-                            </h2>
-
-                            <form onSubmit={handleUpdateProfile} className="space-y-6">
-                                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                                    <div className="relative group">
-                                        <div className="w-24 h-24 bg-gray-100 rounded-2xl overflow-hidden border-2 border-gray-100 shadow-inner">
-                                            {profilePicture ? (
-                                                <img src={profilePicture} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <User className="w-10 h-10 text-gray-300" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <button
-                                            type="button"
-                                            className="absolute -bottom-2 -right-2 p-2 bg-[#637D37] text-white rounded-xl shadow-lg shadow-[#637D37]/30 hover:scale-110 transition-transform"
-                                        >
-                                            <Camera className="w-4 h-4" />
-                                        </button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={user.userName}
+                                            disabled
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                        />
                                     </div>
-
-                                    <div className="flex-1 w-full space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Display Name</label>
-                                                <div className="relative">
-                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
-                                                    <input
-                                                        type="text"
-                                                        value={userName}
-                                                        onChange={(e) => setUserName(e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#637D37] outline-none"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
-                                                <div className="relative">
-                                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
-                                                    <input
-                                                        type="tel"
-                                                        value={phoneNumber}
-                                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#637D37] outline-none"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Email Address (Read Only)</label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4" />
-                                                <input
-                                                    type="email"
-                                                    disabled
-                                                    value={email}
-                                                    className="w-full pl-11 pr-4 py-3 bg-gray-100 border-none rounded-2xl text-gray-400 cursor-not-allowed"
-                                                />
-                                            </div>
-                                        </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                        <input
+                                            type="email"
+                                            value={user.email}
+                                            disabled
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                        <input
+                                            type="text"
+                                            value={user.role}
+                                            disabled
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                        />
                                     </div>
                                 </div>
 
-                                <div className="pt-4 flex justify-end">
+                                <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4 mt-8">
+                                    <p className="text-sm text-yellow-800">
+                                        Note: To check your order history, please visit the "My Orders" page from the main menu.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "addresses" && (
+                            <div className="space-y-6 animate-in fade-in duration-500">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-900">Saved Addresses</h2>
                                     <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="px-8 py-3 bg-[#637D37] text-white rounded-xl font-bold shadow-lg shadow-[#637D37]/20 flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
+                                        onClick={() => setShowAddModal(true)}
+                                        className="flex items-center gap-2 bg-[#637D37] text-white px-4 py-2 rounded-lg hover:bg-[#52682d] transition-colors"
                                     >
-                                        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                                        Save Changes
+                                        <Plus className="w-4 h-4" />
+                                        Add New
                                     </button>
                                 </div>
-                            </form>
-                        </section>
-                    </div>
 
-                    {/* Password Section */}
-                    <div className="lg:col-span-1">
-                        <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                            <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                                <Lock className="w-6 h-6 text-[#637D37]" />
-                                Security
-                            </h2>
-
-                            <form onSubmit={handleChangePassword} className="space-y-6">
-                                <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Current Password</label>
-                                    <div className="relative">
-                                        <input
-                                            type={showPasswords ? "text" : "password"}
-                                            value={currentPassword}
-                                            onChange={(e) => setCurrentPassword(e.target.value)}
-                                            className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#637D37] outline-none"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPasswords(!showPasswords)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"
-                                        >
-                                            {showPasswords ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
+                                {loadingAddresses ? (
+                                    <div className="flex justify-center py-12">
+                                        <Loader2 className="w-8 h-8 animate-spin text-[#637D37]" />
                                     </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">New Password</label>
-                                    <input
-                                        type={showPasswords ? "text" : "password"}
-                                        placeholder="Min 6 characters"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#637D37] outline-none"
-                                        required
-                                    />
-                                    <input
-                                        type={showPasswords ? "text" : "password"}
-                                        placeholder="Confirm new password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#637D37] outline-none"
-                                        required
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg shadow-gray-200 hover:scale-[1.02] transition-all disabled:opacity-50"
-                                >
-                                    Update Password
-                                </button>
-                            </form>
-                        </section>
+                                ) : addresses.length === 0 ? (
+                                    <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-2xl">
+                                        <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                                        <p className="text-gray-500">No saved addresses found</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {addresses.map((addr) => (
+                                            <div key={addr.id} className="border border-gray-100 rounded-xl p-6 relative group hover:shadow-md transition-shadow">
+                                                {addr.isDefault && (
+                                                    <span className="absolute top-4 right-4 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                                                        <CheckCircle className="w-3 h-3" /> Default
+                                                    </span>
+                                                )}
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        {addr.title === "Home" ? <Home className="w-5 h-5 text-[#637D37]" /> : <Briefcase className="w-5 h-5 text-blue-600" />}
+                                                        <h3 className="font-bold text-gray-900">{addr.title}</h3>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteAddress(addr.id)}
+                                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                                <p className="text-gray-900 font-medium">{addr.name}</p>
+                                                <p className="text-gray-600 text-sm mt-1">{addr.address}</p>
+                                                <p className="text-gray-600 text-sm">{addr.city}, {addr.state} {addr.zip}</p>
+                                                <p className="text-gray-600 text-sm mt-2 flex items-center gap-2">
+                                                    <span className="font-semibold">Phone:</span> {addr.phone}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* Add Address Modal */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl p-6 w-full max-w-lg animate-in zoom-in duration-300">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Add New Address</h3>
+                        <form onSubmit={handleAddAddress} className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                                    <select
+                                        className="w-full px-3 py-2 border rounded-lg"
+                                        value={newAddress.title}
+                                        onChange={(e) => setNewAddress({ ...newAddress, title: e.target.value })}
+                                    >
+                                        <option value="Home">Home</option>
+                                        <option value="Work">Work</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-3 py-2 border rounded-lg"
+                                        value={newAddress.name}
+                                        onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <textarea
+                                    required
+                                    rows="2"
+                                    className="w-full px-3 py-2 border rounded-lg"
+                                    value={newAddress.address}
+                                    onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                                ></textarea>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                    <input required type="text" className="w-full px-3 py-2 border rounded-lg" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                                    <input required type="text" className="w-full px-3 py-2 border rounded-lg" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                                    <input required type="text" className="w-full px-3 py-2 border rounded-lg" value={newAddress.zip} onChange={(e) => setNewAddress({ ...newAddress, zip: e.target.value })} />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                    <input required type="text" className="w-full px-3 py-2 border rounded-lg" value={newAddress.phone} onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="default"
+                                    checked={newAddress.isDefault}
+                                    onChange={(e) => setNewAddress({ ...newAddress, isDefault: e.target.checked })}
+                                    className="w-4 h-4 text-[#637D37] border-gray-300 rounded focus:ring-[#637D37]"
+                                />
+                                <label htmlFor="default" className="text-sm text-gray-700">Set as default address</label>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddModal(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 px-4 py-2 bg-[#637D37] text-white rounded-lg hover:bg-[#52682d]"
+                                >
+                                    Save Address
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

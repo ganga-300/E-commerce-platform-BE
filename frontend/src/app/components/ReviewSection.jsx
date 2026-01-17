@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Star, MessageSquare, ThumbsUp, Loader2, User } from "lucide-react"
+import { Star, MessageSquare, ThumbsUp, Loader2, User, Trash2 } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
 
 export default function ReviewSection({ productId }) {
@@ -81,6 +81,29 @@ export default function ReviewSection({ productId }) {
             }
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    const handleDeleteReview = async (reviewId) => {
+        if (!confirm("Are you sure you want to delete your review?")) return
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/reviews/${reviewId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.message || "Failed to delete review")
+            }
+
+            setMessage("Review deleted successfully")
+            fetchReviews()
+        } catch (err) {
+            setMessage(`Error: ${err.message}`)
         }
     }
 
@@ -211,6 +234,15 @@ export default function ReviewSection({ productId }) {
                                 </button>
                                 {review.verified && (
                                     <span className="text-[10px] uppercase font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">Verified</span>
+                                )}
+                                {user && user.id === review.userId && (
+                                    <button
+                                        onClick={() => handleDeleteReview(review.id)}
+                                        className="ml-auto flex items-center gap-1 text-red-500 hover:text-red-700 text-xs font-bold transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                        Delete
+                                    </button>
                                 )}
                             </div>
                         </div>
