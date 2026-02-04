@@ -17,6 +17,7 @@ import { useCart } from "@/contexts/CartContext"
 import { useWishlist } from "@/contexts/WishlistContext"
 import { useToast } from "@/contexts/ToastContext"
 import ReviewSection from "@/app/components/ReviewSection"
+import RelatedProducts from "@/app/components/RelatedProducts"
 import { Breadcrumbs } from "@/components/ui/breadcrumbs"
 
 export default function ProductDetailsClient({ product }) {
@@ -157,6 +158,7 @@ export default function ProductDetailsClient({ product }) {
                 {/* Review Section - Assuming it works as a client component or handles its own data fetching if not passed props */}
                 {/* Previous implementation passed productId={id} */}
                 <ReviewSection productId={product.id} />
+                <RelatedProducts currentProductId={product.id} category={product.family} />
             </div>
         </div>
     )
