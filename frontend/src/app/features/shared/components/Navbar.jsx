@@ -10,11 +10,14 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import MegaMenu from './MegaMenu';
+import CartDrawer from './CartDrawer';
+import { useState } from 'react';
 
 function Navbar() {
   const { totalItems, clearCart } = useCart();
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -22,11 +25,7 @@ function Navbar() {
   };
 
   const handleCartClick = () => {
-    if (user) {
-      router.push('/cart');
-    } else {
-      router.push('/login');
-    }
+    setIsCartOpen(true);
   };
   return (
     <div className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 bg-background/80 backdrop-blur-md border-b border-border shadow-sm transition-colors duration-300">
@@ -136,6 +135,7 @@ function Navbar() {
           </div>
         )}
       </div>
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 }
