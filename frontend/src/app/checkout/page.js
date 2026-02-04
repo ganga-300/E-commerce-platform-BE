@@ -337,6 +337,16 @@ export default function ProfessionalCheckout() {
                       </select>
                     </div>
                     <div>
+                      <label className="text-xs font-bold uppercase text-muted-foreground mb-1 block">City</label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 rounded-xl bg-muted/50 border-transparent focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                        value={address.city}
+                        onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                        placeholder="City"
+                      />
+                    </div>
+                    <div>
                       <label className="text-xs font-bold uppercase text-muted-foreground mb-1 block">Zip Code</label>
                       <input
                         type="text"

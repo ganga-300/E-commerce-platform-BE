@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -10,6 +11,11 @@ import Image from 'next/image'
 export default function CartDrawer({ isOpen, onClose }) {
     const { quantity, addItem, removeItem, totalItems } = useCart()
     const drawerRef = useRef(null)
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     // Close on click outside
     useEffect(() => {
@@ -31,7 +37,9 @@ export default function CartDrawer({ isOpen, onClose }) {
     const cartItems = Object.values(quantity)
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0)
 
-    return (
+    if (!mounted) return null
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -40,7 +48,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999]"
                     />
 
                     {/* Drawer */}
@@ -50,7 +58,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col"
+                        className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[10000] flex flex-col"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -135,8 +143,6 @@ export default function CartDrawer({ isOpen, onClose }) {
 
                                                 <button
                                                     onClick={() => {
-                                                        // Remove all quantity? CartContext currently removes one by one or checks <= 1.
-                                                        // I'll just call removeItem, user can click multiple times or I update context later to support 'remove completely'
                                                         removeItem(item.name)
                                                     }}
                                                     className="text-xs text-red-500 hover:text-red-600 font-medium underline decoration-red-200 hover:decoration-red-600 transition-all"
@@ -183,6 +189,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                     </motion.div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     )
 }
