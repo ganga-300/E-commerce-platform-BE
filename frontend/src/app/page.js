@@ -7,22 +7,23 @@ import Hero from "./components/Hero"
 import Products from "./components/ProductsSection"
 import WhyChooseUs from "./components/WhyChooseUs"
 import CTASection from "./components/CTASection"
+import PageTransition from "@/components/PageTransition"
 
 export default function Page() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    console.log("Home Page - Current User Role:", user?.role);
+    // console.log("Home Page - Current User Role:", user?.role);
     if (!loading && user?.role?.toUpperCase() === "SELLER") {
-      console.log("Home Page - Redirecting Seller to /seller");
+      // console.log("Home Page - Redirecting Seller to /seller");
       router.push("/seller")
     }
   }, [user, loading, router])
 
   if (loading) return null; // Prevent flash of home content
   return (
-    <main className="flex flex-col items-center justify-center w-full">
+    <PageTransition className="flex flex-col items-center justify-center w-full">
 
       <section className="relative w-full">
         <Hero />
@@ -42,6 +43,6 @@ export default function Page() {
       <section id="cta" className="w-full">
         <CTASection />
       </section>
-    </main>
+    </PageTransition>
   )
 }
