@@ -19,7 +19,8 @@ async function getProduct(id) {
 
 // Generate Metadata for SEO
 export async function generateMetadata({ params }) {
-    const product = await getProduct(params.id)
+    const { id } = await params
+    const product = await getProduct(id)
 
     if (!product) {
         return {
@@ -39,7 +40,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductPage({ params }) {
-    const product = await getProduct(params.id)
+    const { id } = await params
+    const product = await getProduct(id)
 
     if (!product) {
         notFound()
