@@ -90,8 +90,9 @@ export default function Hero() {
             <span className="italic font-light text-[#637D37] md:ml-12">& Art Supplies</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-[#3A433E] font-medium leading-relaxed max-w-3xl mx-auto mb-10 opacity-80">
-            Shop the finest collection of <span className="text-[#1B3022] font-semibold">Notebooks</span>, <span className="text-[#1B3022] font-semibold">High-Performance Pens</span>, and <span className="text-[#1B3022] font-semibold">Professional Craft Materials</span>. Designed for students, artists, and creators.
+          <p className="text-xl md:text-2xl text-[#3A433E] font-sans font-light leading-relaxed max-w-4xl mx-auto mb-10 opacity-90">
+            Shop the finest collection of <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">Notebooks</span>, <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">High-Performance Pens</span>, and <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">Professional Craft Materials</span>.
+            <span className="block mt-6 text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#1B3022]/60">Designed for students, artists, and creators</span>
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 mb-12 opacity-60">
