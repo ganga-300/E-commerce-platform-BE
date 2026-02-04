@@ -22,10 +22,15 @@ export default function ProductsSection() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/categories`)
         if (res.ok) {
           const data = await res.json()
-          setCategories([{ id: "all", name: "All Products" }, ...data])
+          console.log("Fetched categories:", data)
+          // Only update if we got valid data
+          if (data && data.length > 0) {
+            setCategories([{ id: "all", name: "All Products" }, ...data])
+          }
         }
       } catch (err) {
         console.error("Categories fetch error:", err)
+        // Keep default categories on error
       }
     }
     fetchCategories()
@@ -77,8 +82,8 @@ export default function ProductsSection() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
               {cat.name}
