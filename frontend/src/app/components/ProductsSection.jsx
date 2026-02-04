@@ -3,44 +3,21 @@ import { useState, useEffect } from "react"
 import ProductCard from "./ProductCard"
 import { Loader2 } from "lucide-react"
 
+// Hardcoded categories based on common product families
+const DEFAULT_CATEGORIES = [
+  { id: "all", name: "All Products" },
+  { id: "STATIONERY", name: "Stationery" },
+  { id: "CRAFT", name: "Crafts" },
+  { id: "ART SUPPLIES", name: "Art Supplies" },
+  { id: "OFFICE", name: "Office" },
+  { id: "BOOKS", name: "Books" }
+]
+
 export default function ProductsSection() {
   const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([
-    { id: "all", name: "All Products", slug: "all" }
-  ])
+  const [categories] = useState(DEFAULT_CATEGORIES)
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
-
-  // Fetch categories from API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/categories`)
-        if (res.ok) {
-          const data = await res.json()
-          console.log("Fetched categories:", data)
-          // Build categories array with "All" option first
-          const allCategories = [
-            { id: "all", name: "All Products", slug: "all" },
-            ...data.map(cat => ({
-              id: cat.id,
-              name: cat.name,
-              slug: cat.slug || cat.name.toLowerCase()
-            }))
-          ]
-          setCategories(allCategories)
-        } else {
-          // Fallback to defaults if API fails
-          setCategories([{ id: "all", name: "All Products", slug: "all" }])
-        }
-      } catch (err) {
-        console.error("Categories fetch error:", err)
-        // Fallback to defaults
-        setCategories([{ id: "all", name: "All Products", slug: "all" }])
-      }
-    }
-    fetchCategories()
-  }, [])
 
   // Fetch products
   useEffect(() => {
@@ -49,19 +26,16 @@ export default function ProductsSection() {
       try {
         let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`
 
-        // For filtering, use the category name (not ID or slug)
+        // Filter by family if not "all"
         if (activeCategory !== "all") {
-          const selectedCat = categories.find(c => c.id === activeCategory || c.slug === activeCategory)
-          if (selectedCat && selectedCat.name !== "All Products") {
-            url += `?category=${selectedCat.name}`
-          }
+          url += `?category=${activeCategory}`
         }
 
         console.log("Fetching products from:", url)
         const res = await fetch(url)
         if (res.ok) {
           const data = await res.json()
-          console.log("Fetched products:", data.length)
+          console.log("Fetched products:", data.length, "products")
           setProducts(data)
         }
       } catch (err) {
@@ -71,10 +45,8 @@ export default function ProductsSection() {
       }
     }
 
-    if (categories.length > 0) {
-      fetchProducts()
-    }
-  }, [activeCategory, categories])
+    fetchProducts()
+  }, [activeCategory])
 
   return (
     <section className="py-20 px-6 bg-white">
@@ -96,8 +68,8 @@ export default function ProductsSection() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
-                ? "bg-gray-900 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
               {cat.name}
