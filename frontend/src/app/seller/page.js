@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package } from "lucide-react"
+import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut } from "lucide-react"
 import Script from "next/script"
 
 export default function SellerDashboard() {
-    const { user, token, loading: authLoading } = useAuth()
+    const { user, token, logout, loading: authLoading } = useAuth()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState("")
@@ -347,6 +347,13 @@ export default function SellerDashboard() {
                                     <TrendingUp className="w-4 h-4" />
                                     Live Data
                                 </div>
+                                <button
+                                    onClick={() => logout()}
+                                    className="px-4 py-2 bg-white text-red-500 border border-red-100 rounded-xl font-bold text-sm hover:bg-red-50 transition-all flex items-center gap-2"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Log Out
+                                </button>
                             </div>
                         </div>
 

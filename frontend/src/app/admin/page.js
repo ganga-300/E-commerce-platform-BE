@@ -19,12 +19,13 @@ import {
     Bell,
     ChevronRight,
     LayoutDashboard,
-    XCircle
+    XCircle,
+    LogOut
 } from "lucide-react"
 import Link from "next/link"
 
 export default function AdminDashboard() {
-    const { user, token, loading: authLoading } = useAuth()
+    const { user, token, logout, loading: authLoading } = useAuth()
     const router = useRouter()
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -134,6 +135,13 @@ export default function AdminDashboard() {
                         <button className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all relative shadow-sm">
                             <Bell className="w-5 h-5 text-gray-400" />
                             <div className="absolute top-3 right-3 w-2 h-2 bg-[#637D37] rounded-full border-2 border-white"></div>
+                        </button>
+                        <button
+                            onClick={() => logout()}
+                            className="flex items-center gap-2 p-3 bg-white border border-red-50 rounded-2xl hover:bg-red-50 text-red-500 transition-all shadow-sm font-bold text-sm"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span className="hidden sm:inline">Log Out</span>
                         </button>
                     </div>
                 </header>
