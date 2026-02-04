@@ -5,7 +5,9 @@ import { Loader2 } from "lucide-react"
 
 export default function ProductsSection() {
   const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState([
+    { id: "all", name: "All Products", slug: "all" }
+  ])
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
 
@@ -95,8 +97,8 @@ export default function ProductsSection() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
               >
                 {cat.name}
