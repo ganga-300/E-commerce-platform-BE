@@ -1,31 +1,34 @@
 "use client"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import ProductCard from "./ProductCard"
 import { Loader2 } from "lucide-react"
 
-const categories = ["All", "Stationery", "Books", "Office", "Crafts"]
-
 export default function ProductsSection() {
   const [products, setProducts] = useState([])
-  const [allCategories, setAllCategories] = useState(categories)
-  const [activeCategory, setActiveCategory] = useState("All")
-  const [activeCategoryId, setActiveCategoryId] = useState(null)
+  const [categories, setCategories] = useState([
+    { id: "all", name: "All Products" },
+    { id: "stationery", name: "Stationery" },
+    { id: "books", name: "Books" },
+    { id: "office", name: "Office" },
+    { id: "crafts", name: "Crafts" }
+  ])
+  const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
 
-  // Fetch categories
+  // Fetch categories from API
   useEffect(() => {
-    const fetchCats = async () => {
+    const fetchCategories = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/categories`)
         if (res.ok) {
           const data = await res.json()
-          setAllCategories(["All", ...data])
+          setCategories([{ id: "all", name: "All Products" }, ...data])
         }
       } catch (err) {
-        console.error("Fetch Categories Error:", err)
+        console.error("Categories fetch error:", err)
       }
     }
-    fetchCats()
+    fetchCategories()
   }, [])
 
   // Fetch products
@@ -35,8 +38,8 @@ export default function ProductsSection() {
       try {
         let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`
 
-        if (activeCategory !== "All") {
-          url += `?category=${activeCategoryId || activeCategory}`
+        if (activeCategory !== "all") {
+          url += `?category=${activeCategory}`
         }
 
         const res = await fetch(url)
@@ -45,24 +48,14 @@ export default function ProductsSection() {
           setProducts(data)
         }
       } catch (err) {
-        console.error("Fetch Products Error:", err)
+        console.error("Products fetch error:", err)
       } finally {
         setLoading(false)
       }
     }
 
     fetchProducts()
-  }, [activeCategory, activeCategoryId])
-
-  const handleCategoryClick = (cat) => {
-    if (cat === "All") {
-      setActiveCategory("All")
-      setActiveCategoryId(null)
-    } else {
-      setActiveCategory(cat.name || cat)
-      setActiveCategoryId(cat.id || null)
-    }
-  }
+  }, [activeCategory])
 
   return (
     <section className="py-20 px-6 bg-white">
@@ -79,21 +72,21 @@ export default function ProductsSection() {
 
         {/* Category Tabs */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {allCategories.map((cat) => (
+          {categories.map((cat) => (
             <button
-              key={cat === "All" ? "all" : cat.id || cat}
-              onClick={() => handleCategoryClick(cat)}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${(cat === "All" ? activeCategory === "All" : activeCategoryId === cat.id || activeCategory === cat.name || activeCategory === cat)
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
                   ? "bg-gray-900 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
             >
-              {cat === "All" ? "All Products" : cat.name || cat}
+              {cat.name}
             </button>
           ))}
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid - 5 columns for smaller cards */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
@@ -103,7 +96,7 @@ export default function ProductsSection() {
             <p className="text-gray-500 text-lg">No products found in this category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
