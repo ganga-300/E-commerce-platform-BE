@@ -352,53 +352,66 @@ export default function SellerDashboard() {
 
     if (isApproved === false) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-                <div className="max-w-2xl w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                    <div className="bg-[#637D37] p-10 text-center text-white">
-                        <div className="bg-white/20 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-md">
-                            <Clock className="w-10 h-10 animate-pulse" />
+            <div className="min-h-screen bg-[#F5F5F0] flex items-center justify-center p-4">
+                <div className="max-w-lg w-full bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(27,48,34,0.1)] overflow-hidden border border-[#1B3022]/5">
+
+                    {/* Luxury Header */}
+                    <div className="bg-[#1B3022] p-8 text-center relative overflow-hidden">
+                        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
+                        <div className="relative z-10">
+                            <div className="bg-[#FCFBF7]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-[#FCFBF7]/20">
+                                <Clock className="w-8 h-8 text-[#FCFBF7] animate-pulse" />
+                            </div>
+                            <h1 className="text-3xl font-serif font-bold text-[#FCFBF7] mb-2 tracking-wide">Application Pending</h1>
+                            <p className="text-[#FCFBF7]/70 font-medium text-sm">We are reviewing your business profile.</p>
                         </div>
-                        <h1 className="text-3xl font-black mb-2">Application Under Review</h1>
-                        <p className="opacity-90 font-medium">Thank you for joining our marketplace!</p>
                     </div>
-                    <div className="p-10 space-y-8">
+
+                    {/* Status Steps */}
+                    <div className="p-8 space-y-6">
                         <div className="space-y-4">
-                            <h2 className="text-xl font-bold text-gray-900">What happens next?</h2>
-                            <div className="grid gap-4">
-                                <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center flex-shrink-0">
-                                        <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900">Admin Verification</h3>
-                                        <p className="text-sm text-gray-500">Our team is currently reviewing your profile and business details to ensure a safe environment for buyers.</p>
+
+                            <div className="flex gap-4 p-4 rounded-xl border border-[#1B3022]/5 bg-[#FAFAF8] hover:border-[#637D37]/30 transition-colors">
+                                <div className="mt-1">
+                                    <div className="w-6 h-6 bg-[#637D37]/10 rounded-full flex items-center justify-center border border-[#637D37]/20">
+                                        <div className="w-2 h-2 bg-[#637D37] rounded-full animate-ping" />
                                     </div>
                                 </div>
-                                <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center flex-shrink-0">
-                                        <Mail className="w-5 h-5 text-blue-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900">Wait for Approval</h3>
-                                        <p className="text-sm text-gray-500">Once your account is approved, you'll receive full access to list products and manage orders.</p>
-                                    </div>
+                                <div>
+                                    <h3 className="font-serif font-bold text-[#1B3022] mb-1">Under Review</h3>
+                                    <p className="text-xs text-[#1B3022]/60 leading-relaxed">Our curation team is verifying your business credentials to ensure they meet our quality standards.</p>
                                 </div>
                             </div>
+
+                            <div className="flex gap-4 p-4 rounded-xl border border-dashed border-[#1B3022]/20 opacity-60">
+                                <div className="mt-1">
+                                    <div className="w-6 h-6 bg-[#1B3022]/5 rounded-full flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-[#1B3022]/20 rounded-full" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="font-serif font-bold text-[#1B3022] mb-1">Approval & Access</h3>
+                                    <p className="text-xs text-[#1B3022]/60 leading-relaxed">Once verified, you will receive full access to manage your inventory and orders.</p>
+                                </div>
+                            </div>
+
                         </div>
 
-                        <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                        {/* Actions */}
+                        <div className="pt-6 border-t border-[#1B3022]/5 grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => window.location.reload()}
-                                className="flex-1 py-4 bg-[#637D37] text-white rounded-2xl font-bold shadow-lg shadow-[#637D37]/20 hover:scale-105 transition-all"
+                                className="col-span-1 py-3 px-4 bg-[#1B3022] text-[#FCFBF7] rounded-lg font-medium text-sm hover:bg-[#2A4030] transition-all flex items-center justify-center gap-2 group"
                             >
-                                Check Status Again
+                                <span>Check Status</span>
+                                <Loader2 className="w-3 h-3 group-hover:rotate-180 transition-transform" />
                             </button>
                             <button
                                 onClick={() => logout()}
-                                className="flex-1 py-4 bg-white text-red-500 border border-red-100 rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+                                className="col-span-1 py-3 px-4 bg-white text-[#8B3A3A] border border-[#8B3A3A]/20 rounded-lg font-medium text-sm hover:bg-[#FEF2F2] transition-all flex items-center justify-center gap-2"
                             >
-                                <LogOut className="w-4 h-4" />
-                                Sign Out
+                                <LogOut className="w-3 h-3" />
+                                <span>Sign Out</span>
                             </button>
                         </div>
                     </div>

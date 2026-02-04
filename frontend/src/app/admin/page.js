@@ -158,22 +158,22 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2 text-[#637D37] font-black text-[10px] uppercase tracking-[0.4em]">
                         <span className="w-4 h-px bg-[#637D37]"></span> SYSTEM OVERVIEW
                     </div>
-                    <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter">
-                        Platform <span className="text-[#637D37]">Intelligence</span>
+                    <h1 className="text-4xl lg:text-5xl font-serif font-bold text-[#1B3022] tracking-wide">
+                        Platform <span className="text-[#637D37] italic">Intelligence</span>
                     </h1>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="bg-white/70 backdrop-blur-xl border border-gray-100 p-2 rounded-2xl flex items-center gap-4 px-4 shadow-sm">
-                        <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center">
-                            <Clock className="w-4 h-4 text-emerald-600" />
+                    <div className="bg-white/70 backdrop-blur-xl border border-[#1B3022]/10 p-2 rounded-2xl flex items-center gap-4 px-4 shadow-sm">
+                        <div className="w-8 h-8 bg-[#1B3022]/5 rounded-xl flex items-center justify-center">
+                            <Clock className="w-4 h-4 text-[#1B3022]" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Global Timestamp</span>
-                            <span className="text-xs font-black text-gray-900">Feb 04, 2026 • 15:43</span>
+                            <span className="text-[8px] font-black text-[#1B3022]/40 uppercase tracking-widest">Global Timestamp</span>
+                            <span className="text-xs font-bold text-[#1B3022]">Feb 04, 2026 • 15:43</span>
                         </div>
                     </div>
-                    <button className="w-12 h-12 bg-white/70 backdrop-blur-xl border border-gray-100 rounded-2xl flex items-center justify-center text-gray-400 hover:text-[#637D37] hover:border-[#637D37]/20 transition-all shadow-sm">
+                    <button className="w-12 h-12 bg-white/70 backdrop-blur-xl border border-[#1B3022]/10 rounded-2xl flex items-center justify-center text-[#1B3022]/40 hover:text-[#1B3022] hover:border-[#1B3022]/20 transition-all shadow-sm">
                         <Bell className="w-5 h-5" />
                     </button>
                 </div>
@@ -183,27 +183,33 @@ export default function AdminDashboard() {
             {data.stats.pendingSellers > 0 && (
                 <motion.div
                     variants={itemVariants}
-                    className="group relative bg-[#637D37] rounded-[40px] p-8 lg:p-10 overflow-hidden shadow-2xl shadow-[#637D37]/20"
+                    className="group relative bg-[#1B3022] rounded-[32px] p-8 lg:p-10 overflow-hidden shadow-2xl shadow-[#1B3022]/20 border border-[#1B3022]/5"
                 >
-                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-5 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
+                    {/* Texture Overlay */}
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat mix-blend-overlay"></div>
+
+                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#637D37] opacity-20 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
+
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="flex items-center gap-8 text-white text-center md:text-left">
-                            <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-[28px] border border-white/20 flex items-center justify-center shadow-inner">
-                                <ShieldCheck className="w-10 h-10 text-white animate-bounce" />
+                        <div className="flex items-center gap-8 text-[#FCFBF7] text-center md:text-left">
+                            <div className="w-20 h-20 bg-[#FCFBF7]/5 backdrop-blur-md rounded-2xl border border-[#FCFBF7]/10 flex items-center justify-center shadow-inner">
+                                <ShieldCheck className="w-10 h-10 text-[#FCFBF7]" />
                             </div>
                             <div>
-                                <h2 className="text-3xl font-black tracking-tight mb-2">Pending Authorizations</h2>
-                                <p className="text-white/70 font-bold text-lg max-w-md leading-relaxed">
-                                    There are <span className="text-white">{data.stats.pendingSellers} premium vendors</span> awaiting validation for marketplace inclusion.
+                                <h2 className="text-3xl font-serif font-bold tracking-wide mb-2">Pending Authorizations</h2>
+                                <p className="text-[#FCFBF7]/70 font-medium text-lg max-w-md leading-relaxed">
+                                    There are <span className="text-white font-bold">{data.stats.pendingSellers} new businesses</span> waiting for approval.
                                 </p>
                             </div>
                         </div>
                         <Link
                             href="/admin/approvals"
-                            className="w-full md:w-auto px-12 py-5 bg-white text-[#637D37] rounded-3xl font-black text-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 shadow-xl"
+                            className="w-full md:w-auto px-10 py-4 bg-[#FCFBF7] text-[#1B3022] rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.2)]"
                         >
-                            Authorize Requests
-                            <ChevronRight className="w-4 h-4" />
+                            <span>Review Requests</span>
+                            <div className="w-6 h-6 bg-[#1B3022]/10 rounded-full flex items-center justify-center">
+                                <ChevronRight className="w-3 h-3 text-[#1B3022]" />
+                            </div>
                         </Link>
                     </div>
                 </motion.div>
@@ -250,12 +256,12 @@ export default function AdminDashboard() {
                 {/* Revenue Momentum Chart */}
                 <motion.div
                     variants={itemVariants}
-                    className="lg:col-span-2 bg-white/70 backdrop-blur-2xl border border-gray-100 rounded-[40px] p-10 shadow-sm relative overflow-hidden"
+                    className="lg:col-span-2 bg-white/70 backdrop-blur-2xl border border-[#1B3022]/5 rounded-[40px] p-10 shadow-sm relative overflow-hidden"
                 >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 relative z-10">
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Revenue Momentum</h2>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">7-Day Financial Trajectory</p>
+                            <h2 className="text-2xl font-serif font-bold text-[#1B3022] tracking-wide">Revenue Momentum</h2>
+                            <p className="text-xs font-black text-[#1B3022]/40 uppercase tracking-widest">7-Day Financial Trajectory</p>
                         </div>
                         <div className="flex items-center gap-4 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100">
                             <button className="px-6 py-2.5 bg-white shadow-sm border border-gray-100 rounded-xl text-[10px] font-black text-[#637D37] uppercase tracking-widest">Gross</button>
@@ -325,12 +331,12 @@ export default function AdminDashboard() {
                 {/* Top Assets */}
                 <motion.div
                     variants={itemVariants}
-                    className="bg-white/70 backdrop-blur-2xl border border-gray-100 rounded-[40px] p-10 shadow-sm"
+                    className="bg-white/70 backdrop-blur-2xl border border-[#1B3022]/5 rounded-[40px] p-10 shadow-sm"
                 >
                     <div className="flex items-center justify-between mb-12">
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Prime Assets</h2>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Marketplace Leaders</p>
+                            <h2 className="text-2xl font-serif font-bold text-[#1B3022] tracking-wide">Prime Assets</h2>
+                            <p className="text-xs font-black text-[#1B3022]/40 uppercase tracking-widest">Marketplace Leaders</p>
                         </div>
                         <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100">
                             <Target className="w-5 h-5 text-gray-400" />
@@ -347,7 +353,7 @@ export default function AdminDashboard() {
                                     <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-[3px] border-white scale-0 group-hover:scale-100 transition-transform duration-500" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-black text-gray-900 text-sm group-hover:text-[#637D37] transition-colors truncate">{p.name}</h3>
+                                    <h3 className="font-bold text-[#1B3022] text-sm group-hover:text-[#637D37] transition-colors truncate">{p.name}</h3>
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{p.sku || "PRO-IDX-04"}</p>
                                 </div>
                                 <div className="text-right">
@@ -358,7 +364,7 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    <button className="w-full mt-12 py-5 bg-gray-900 text-white rounded-[24px] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-gray-900/10 hover:scale-[1.02] active:scale-95 transition-all">
+                    <button className="w-full mt-12 py-5 bg-[#1B3022] text-white rounded-[24px] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#1B3022]/10 hover:scale-[1.02] active:scale-95 transition-all">
                         Full Product Registry
                     </button>
                 </motion.div>
@@ -366,12 +372,12 @@ export default function AdminDashboard() {
                 {/* Recent Event Feed */}
                 <motion.div
                     variants={itemVariants}
-                    className="lg:col-span-3 bg-white/70 backdrop-blur-2xl border border-gray-100 rounded-[40px] overflow-hidden shadow-sm"
+                    className="lg:col-span-3 bg-white/70 backdrop-blur-2xl border border-[#1B3022]/5 rounded-[40px] overflow-hidden shadow-sm"
                 >
                     <div className="p-10 border-b border-gray-50 flex items-center justify-between">
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Intelligence Feed</h2>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Real-time Transaction Logs</p>
+                            <h2 className="text-2xl font-serif font-bold text-[#1B3022] tracking-wide">Intelligence Feed</h2>
+                            <p className="text-xs font-black text-[#1B3022]/40 uppercase tracking-widest">Real-time Transaction Logs</p>
                         </div>
                         <button className="px-8 py-3 bg-white border border-gray-100 rounded-2xl text-[10px] font-black text-gray-600 hover:text-[#637D37] hover:border-[#637D37]/20 transition-all shadow-sm uppercase tracking-widest">Export Dataset</button>
                     </div>
@@ -448,7 +454,7 @@ function IntelligenceCard({ title, value, trend, icon, color, href }) {
 
     return (
         <Link href={href} className="block group h-full">
-            <div className={`relative h-full p-8 bg-white/70 backdrop-blur-2xl rounded-[40px] border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:shadow-gray-200/50 hover:-translate-y-2 overflow-hidden`}>
+            <div className={`relative h-full p-8 bg-white/70 backdrop-blur-2xl rounded-[40px] border border-[#1B3022]/5 transition-all duration-500 hover:shadow-2xl hover:shadow-[#1B3022]/5 hover:-translate-y-2 overflow-hidden`}>
                 <div className="flex justify-between items-start mb-10 relative z-10">
                     <div className={`p-5 rounded-[24px] ${iconBg[color]} transition-transform duration-500 group-hover:scale-110 shadow-inner`}>
                         <div className={color.startsWith('#') ? "" : colorMap[color].split(' ')[0]}>
@@ -467,8 +473,8 @@ function IntelligenceCard({ title, value, trend, icon, color, href }) {
                 </div>
 
                 <div className="space-y-1 relative z-10">
-                    <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.4em]">{title}</h3>
-                    <p className="text-4xl font-black text-gray-900 tracking-tighter tabular-nums">{value}</p>
+                    <h3 className="text-[#1B3022]/40 text-[10px] font-black uppercase tracking-[0.4em]">{title}</h3>
+                    <p className="text-4xl font-serif font-bold text-[#1B3022] tracking-tighter tabular-nums">{value}</p>
                 </div>
 
                 {/* Abstract Background Design */}

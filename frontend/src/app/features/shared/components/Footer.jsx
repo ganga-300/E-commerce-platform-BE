@@ -64,7 +64,7 @@ function ElegantFooter() {
 
           {/* Contact Information */}
           <div>
-            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#FCFBF7]/40 mb-8">Atelier</h3>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-[#FCFBF7]/40 mb-8">Visit Us</h3>
             <div className="space-y-6">
               <div className="flex items-start gap-4 group">
                 <MapPin className="w-5 h-5 text-[#637D37] shrink-0 mt-0.5" />

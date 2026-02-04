@@ -21,13 +21,20 @@ export default function Page() {
   if (loading) return null; // Prevent flash of home content
 
   // Strict Redirect for Admin/Seller
+  useEffect(() => {
+    if (!loading && user) {
+      const role = user?.role?.toUpperCase()
+      if (role === 'ADMIN' || role === 'SUPERADMIN') {
+        router.replace('/admin')
+      } else if (role === 'SELLER') {
+        router.replace('/seller')
+      }
+    }
+  }, [user, loading, router])
+
+  // Prevent flash of content for restricted roles
   const role = user?.role?.toUpperCase()
-  if (role === 'ADMIN' || role === 'SUPERADMIN') {
-    router.replace('/admin')
-    return null
-  }
-  if (role === 'SELLER') {
-    router.replace('/seller')
+  if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SELLER') {
     return null
   }
 
