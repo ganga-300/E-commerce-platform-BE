@@ -78,21 +78,29 @@ export default function Hero() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="inline-flex items-center gap-4 px-6 py-2 bg-[#1B3022] text-[#FCFBF7] text-[10px] font-black uppercase tracking-[0.4em]"
+              className="inline-flex items-center gap-4 px-6 py-2 bg-[#1B3022] text-[#FCFBF7] text-[10px] font-black uppercase tracking-[0.2em] rounded-full"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Atelier Series • 2024
+              India's Premier Stationery Marketplace
             </motion.div>
           </div>
 
-          <h1 className="text-8xl md:text-[11rem] font-serif text-[#1B3022] leading-[0.8] mb-12 tracking-tighter">
-            Writing <br />
-            <span className="italic font-light text-[#637D37] ml-20">As Art</span>
+          <h1 className="text-6xl md:text-8xl font-serif text-[#1B3022] leading-[1] mb-8 tracking-tight">
+            Curated Stationery <br />
+            <span className="italic font-light text-[#637D37] md:ml-12">& Art Supplies</span>
           </h1>
 
-          <p className="text-2xl text-[#3A433E] font-medium leading-relaxed max-w-2xl mx-auto mb-16 opacity-80">
-            A bespoke marketplace for instruments that turn every word into a legacy. Curated for the poetic mind and the technical hand.
+          <p className="text-xl md:text-2xl text-[#3A433E] font-medium leading-relaxed max-w-3xl mx-auto mb-10 opacity-80">
+            Shop the finest collection of <span className="text-[#1B3022] font-semibold">Notebooks</span>, <span className="text-[#1B3022] font-semibold">High-Performance Pens</span>, and <span className="text-[#1B3022] font-semibold">Professional Craft Materials</span>. Designed for students, artists, and creators.
           </p>
+
+          <div className="flex flex-wrap justify-center gap-3 mb-12 opacity-60">
+            {["Premium Notebooks", "Fine Writing", "Art Essentials", "Office Gear", "Craft Kits"].map((item, i) => (
+              <span key={i} className="px-3 py-1 border border-[#1B3022]/20 rounded-full text-[10px] uppercase tracking-widest text-[#1B3022] font-bold">
+                {item}
+              </span>
+            ))}
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-10 items-center justify-center">
             <Link href="/#products">
