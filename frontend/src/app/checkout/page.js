@@ -370,35 +370,46 @@ export default function ProfessionalCheckout() {
               )}
 
               {currentStep === 3 && (
-                <div className="bg-card rounded-2xl p-8 border border-border shadow-sm text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6 text-primary">
-                    <Shield className="w-10 h-10" />
-                  </div>
-                  <h2 className="text-2xl font-black text-foreground mb-2">Secure Payment</h2>
-                  <p className="text-muted-foreground mb-8">Click below to proceed to Razorpay secure gateway.</p>
-
-                  <div className="max-w-md mx-auto bg-muted/30 rounded-2xl p-6 mb-8 border border-border">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-xs font-bold uppercase text-muted-foreground">Total to Pay</span>
-                      <span className="text-2xl font-black text-primary">₹{totalAmount}</span>
+                <div className="bg-card rounded-2xl p-12 border border-border shadow-sm">
+                  <div className="max-w-lg mx-auto text-center">
+                    {/* Icon */}
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-primary/10 rounded-full mb-6">
+                      <Shield className="w-12 h-12 text-primary" />
                     </div>
-                    <div className="h-px bg-border my-4"></div>
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                      <Shield className="w-3 h-3" /> 128-bit SSL Encrypted
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={handlePaymentComplete}
-                    disabled={paymentStatus === "processing"}
-                    className="w-full max-w-sm bg-primary text-primary-foreground font-black py-4 rounded-xl shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
-                  >
-                    {paymentStatus === "processing" ? (
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                    ) : (
-                      "PAY NOW"
-                    )}
-                  </button>
+                    {/* Heading */}
+                    <h2 className="text-3xl font-black text-foreground mb-3">Secure Payment</h2>
+                    <p className="text-muted-foreground mb-12">Click below to proceed to Razorpay secure gateway.</p>
+
+                    {/* Payment Box */}
+                    <div className="bg-muted/30 rounded-2xl p-8 mb-10 border border-border">
+                      <div className="flex justify-between items-center mb-6">
+                        <span className="text-sm font-bold uppercase text-muted-foreground">Total to Pay</span>
+                        <span className="text-4xl font-black text-primary">₹{totalAmount}</span>
+                      </div>
+                      <div className="h-px bg-border mb-6"></div>
+                      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                        <Shield className="w-4 h-4" />
+                        <span>128-bit SSL Encrypted</span>
+                      </div>
+                    </div>
+
+                    {/* Payment Button */}
+                    <button
+                      onClick={handlePaymentComplete}
+                      disabled={paymentStatus === "processing"}
+                      className="w-full bg-primary text-primary-foreground font-black py-5 rounded-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3 text-lg"
+                    >
+                      {paymentStatus === "processing" ? (
+                        <>
+                          <RefreshCw className="w-5 h-5 animate-spin" />
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        "PAY NOW"
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
 
