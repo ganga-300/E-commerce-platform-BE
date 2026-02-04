@@ -9,6 +9,7 @@ import { Heart } from "lucide-react"
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import MegaMenu from './MegaMenu';
 
 function Navbar() {
   const { totalItems, clearCart } = useCart();
@@ -28,19 +29,27 @@ function Navbar() {
     }
   };
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <div className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 bg-background/80 backdrop-blur-md border-b border-border shadow-sm transition-colors duration-300">
 
       <div className="flex items-center space-x-12">
         <Link href="/">
-          <h1 style={{ fontFamily: 'TTRamillas' }} className="text-3xl font-bold text-black cursor-pointer">
-            Study<span style={{ color: '#637D37' }}>Stuff</span>
+          <h1 className="text-3xl font-heading font-bold text-foreground cursor-pointer tracking-tight">
+            Study<span className="text-primary">Stuff</span>
           </h1>
         </Link>
 
-        <form onSubmit={(e) => { e.preventDefault(); router.push(`/search?query=${e.target.search.value}`); }} className="relative w-full max-w-sm mx-auto">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-6">
+          <MegaMenu />
+          <Link href="/about" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+            About
+          </Link>
+        </div>
+
+        <form onSubmit={(e) => { e.preventDefault(); router.push(`/search?query=${e.target.search.value}`); }} className="relative w-full max-w-sm hidden lg:block">
           <button type="submit" className="absolute inset-y-0 left-0 flex items-center pl-4">
             <svg
-              className="h-4 w-4 text-gray-400"
+              className="h-4 w-4 text-muted-foreground"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -58,26 +67,21 @@ function Navbar() {
             name="search"
             type="text"
             placeholder="Search premium products..."
-            className="pl-10 pr-4 py-2 h-10 w-full rounded-xl bg-gray-50 border-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#637D37]/20 focus:bg-white transition-all"
+            className="pl-10 pr-4 py-2 h-10 w-full rounded-xl bg-muted border-none text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-background transition-all"
           />
         </form>
       </div>
 
-      <div className="flex items-center space-x-8">
-        <Link href="/about" className="text-sm font-semibold text-gray-600 hover:text-[#637D37] transition-colors">
-          About
-        </Link>
-
-        <Link href="/wishlist" className="text-sm font-semibold text-gray-600 hover:text-red-500 transition-colors flex items-center gap-1">
-          <Heart className="w-4 h-4" />
-          Wishlist
+      <div className="flex items-center space-x-6">
+        <Link href="/wishlist" className="text-sm font-semibold text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1 group">
+          <Heart className="w-5 h-5 group-hover:fill-destructive transition-colors" />
         </Link>
 
         <div className="relative">
           <button
             onClick={handleCartClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white font-bold text-sm transition-all
-              ${totalItems > 0 ? 'bg-[#637D37] shadow-lg shadow-[#637D37]/20' : 'bg-gray-400'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-primary-foreground font-bold text-sm transition-all hover:scale-105 active:scale-95
+              ${totalItems > 0 ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'}`}
           >
             <FiShoppingCart className="text-lg" />
             <span>Cart ({totalItems})</span>

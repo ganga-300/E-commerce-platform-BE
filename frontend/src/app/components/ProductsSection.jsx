@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react"
 import ProductCard from "./ProductCard"
 import { Loader2, Filter, ChevronDown, LayoutGrid, Star } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDebounce } from "@/hooks/useDebounce"
 
 const categories = ["All", "Stationery", "Books", "Office", "Crafts"]
 
@@ -24,6 +25,10 @@ export default function ProductsSection() {
   const [sortBy, setSortBy] = useState("default")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
+
+  const debouncedMinPrice = useDebounce(minPrice, 500)
+  const debouncedMaxPrice = useDebounce(maxPrice, 500)
+
   const [minRating, setMinRating] = useState(0)
 
   // Fetch Categories
@@ -50,8 +55,8 @@ export default function ProductsSection() {
         let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products?`
 
         if (activeCategoryId) url += `category=${activeCategoryId}&`
-        if (minPrice) url += `minPrice=${minPrice}&`
-        if (maxPrice) url += `maxPrice=${maxPrice}&`
+        if (debouncedMinPrice) url += `minPrice=${debouncedMinPrice}&`
+        if (debouncedMaxPrice) url += `maxPrice=${debouncedMaxPrice}&`
         if (minRating) url += `minRating=${minRating}&`
 
         // Map sort frontend values to backend ones
@@ -71,7 +76,7 @@ export default function ProductsSection() {
       }
     }
     fetchProducts()
-  }, [activeCategoryId, sortBy, minPrice, maxPrice, minRating])
+  }, [activeCategoryId, sortBy, debouncedMinPrice, debouncedMaxPrice, minRating])
 
   const handleCategoryClick = (cat) => {
     setActiveCategory(cat === "All" ? "All" : cat.name)
