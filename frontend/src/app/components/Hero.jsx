@@ -1,149 +1,132 @@
 "use client"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, Sparkles, Play } from "lucide-react"
-import { motion } from "framer-motion"
+import { ArrowRight, Feather, Sparkles, Scroll } from "lucide-react"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { useRef } from "react"
 
 export default function Hero() {
+  const containerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  })
+
+  // Parallax offsets for floating elements
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200])
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -100])
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -300])
+  const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 15])
+  const rotate2 = useTransform(scrollYProgress, [0, 1], [-5, 10])
+
   return (
-    <section className="relative min-h-[92vh] flex items-center bg-[#020617] overflow-hidden">
-      {/* Dynamic Ambient Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#637D37]/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#637D37]/10 rounded-full blur-[150px]" />
-        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-blue-500/5 rounded-full blur-[100px]" />
+    <section ref={containerRef} className="relative min-h-[110vh] flex items-center justify-center bg-[#FCFBF7] overflow-hidden">
+      {/* Editorial Background Detail */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-[#1B3022]/[0.02] via-transparent to-[#637D37]/[0.02] rotate-12" />
+        <div className="absolute top-20 left-20 w-px h-[80vh] bg-[#1B3022]/10" />
+        <div className="absolute top-20 right-20 w-px h-[80vh] bg-[#1B3022]/10" />
       </div>
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.15] bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+      {/* Floating 3D Elements Area */}
+      <div className="absolute inset-0 z-0">
+        {/* Top Left: Floating Pen */}
+        <motion.div
+          style={{ y: y1, rotate: rotate1 }}
+          className="absolute top-[15%] left-[10%] w-[300px] h-[300px] opacity-90 transition-all duration-75"
+        >
+          <Image
+            src="/assets/luxury_pen.png"
+            alt="Handcrafted Pen"
+            fill
+            className="object-contain drop-shadow-[20px_40px_60px_rgba(27,48,34,0.15)]"
+          />
+        </motion.div>
 
-      <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* Bottom Right: Ink Bottle */}
+        <motion.div
+          style={{ y: y3, rotate: rotate2 }}
+          className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] opacity-80"
+        >
+          <Image
+            src="/assets/luxury_ink.png"
+            alt="Bespoke Ink"
+            fill
+            className="object-contain drop-shadow-[40px_40px_80px_rgba(27,48,34,0.2)]"
+          />
+        </motion.div>
 
-          {/* Left Content: Text & CTAs */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="z-10"
-          >
-            {/* Intelligence Badge */}
+        {/* Top Right: Decorative Swirl/Detail */}
+        <motion.div
+          style={{ y: y2 }}
+          className="absolute top-[20%] right-[15%] flex flex-col items-center gap-4 text-[#1B3022]/20"
+        >
+          <Scroll className="w-12 h-12" />
+          <div className="w-px h-32 bg-current" />
+        </motion.div>
+      </div>
+
+      {/* Centered Editorial Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="flex justify-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8 shadow-2xl"
+              transition={{ delay: 0.5 }}
+              className="inline-flex items-center gap-4 px-6 py-2 bg-[#1B3022] text-[#FCFBF7] text-[10px] font-black uppercase tracking-[0.4em]"
             >
-              <Sparkles className="w-4 h-4 text-[#8baf4e]" />
-              <span className="text-sm font-medium text-white/80 tracking-widest uppercase">The Intelligence Suite 2024</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              Atelier Series • 2024
             </motion.div>
+          </div>
 
-            {/* High-Fidelity Heading */}
-            <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-white leading-[0.9] mb-8 tracking-tighter">
-              Aesthetics <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8baf4e] via-[#637D37] to-[#8baf4e] italic bg-[length:200%_auto] animate-gradient">
-                Unlocked
-              </span>
-            </h1>
+          <h1 className="text-8xl md:text-[11rem] font-serif text-[#1B3022] leading-[0.8] mb-12 tracking-tighter">
+            Writing <br />
+            <span className="italic font-light text-[#637D37] ml-20">As Art</span>
+          </h1>
 
-            <p className="text-xl text-slate-400 font-light mb-12 max-w-xl leading-relaxed">
-              Experience India's most curated stationery marketplace. Engineered for high-performance learners and creative professionals.
-            </p>
+          <p className="text-2xl text-[#3A433E] font-medium leading-relaxed max-w-2xl mx-auto mb-16 opacity-80">
+            A bespoke marketplace for instruments that turn every word into a legacy. Curated for the poetic mind and the technical hand.
+          </p>
 
-            {/* Action Group */}
-            <div className="flex flex-col sm:flex-row gap-5">
-              <Link href="/#products">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group relative px-8 py-4 bg-[#637D37] text-white font-semibold rounded-xl overflow-hidden shadow-[0_0_30px_rgba(99,125,55,0.3)]"
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                  <span className="relative flex items-center gap-2">
-                    EXPLORE COLLECTION
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </motion.button>
-              </Link>
-
+          <div className="flex flex-col sm:flex-row gap-10 items-center justify-center">
+            <Link href="/#products">
               <motion.button
-                whileHover={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-                className="px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white font-medium rounded-xl flex items-center gap-3 transition-colors"
+                whileHover={{ scale: 1.05, shadow: "0 30px 60px rgba(27,48,34,0.15)" }}
+                whileTap={{ scale: 0.98 }}
+                className="px-14 py-6 bg-[#1B3022] text-[#FCFBF7] font-serif text-xl border border-[#1B3022] transition-all group"
               >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <Play className="w-4 h-4 fill-white translate-x-0.5" />
-                </div>
-                HOW IT WORKS
+                Explore The Collection
               </motion.button>
-            </div>
+            </Link>
 
-            {/* Live Metrics Overlay */}
-            <div className="mt-16 pt-8 border-t border-white/10 flex gap-12">
-              <div className="space-y-1">
-                <div className="text-3xl font-bold text-white tracking-tighter">12k+</div>
-                <div className="text-xs uppercase tracking-widest text-slate-500">Active Users</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold text-white tracking-tighter">4.9/5</div>
-                <div className="text-xs uppercase tracking-widest text-slate-500">Reviews</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold text-white tracking-tighter">24h</div>
-                <div className="text-xs uppercase tracking-widest text-slate-500">Delivery</div>
-              </div>
-            </div>
-          </motion.div>
+            <Link href="/about" className="group flex items-center gap-4 text-[#1B3022] font-black uppercase text-[10px] tracking-[0.3em] transition-all">
+              <span className="border-b border-[#1B3022] pb-1 group-hover:border-[#637D37] group-hover:text-[#637D37]">Our Craftsmanship</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+            </Link>
+          </div>
+        </motion.div>
 
-          {/* Right Content: Glassmorphic Visuals */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="relative"
-          >
-            {/* Main Interactive Card */}
-            <div className="relative z-10 p-8 rounded-[2rem] bg-white/5 backdrop-blur-3xl border border-white/10 shadow-2xl overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#637D37]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=2000&auto=format&fit=crop"
-                  alt="Premium Collection"
-                  fill
-                  className="object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
-                  priority
-                />
-
-                {/* Floating Intelligence Label */}
-                <div className="absolute bottom-6 left-6 right-6 p-4 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="text-xs text-white/60 tracking-widest uppercase">Curated Series</div>
-                      <div className="text-white font-medium">Premium Artist Edition</div>
-                    </div>
-                    <div className="px-3 py-1 bg-[#637D37] rounded-lg text-xs font-bold text-white">
-                      NEW ARRIVAL
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Orbiting Decor Elements */}
-            <motion.div
-              animate={{ y: [0, -20, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-[#8baf4e] to-[#637D37] rounded-full blur-2xl opacity-40"
-            />
-            <motion.div
-              animate={{ y: [0, 20, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600 rounded-full blur-3xl opacity-20"
-            />
-          </motion.div>
-
+        {/* Vertical Text Side Detail */}
+        <div className="hidden lg:block absolute left-[-10%] top-1/2 -rotate-90 origin-center text-[10px] font-black uppercase tracking-[0.5em] text-[#1B3022]/20">
+          The Discerning Collector • Edition No. 04
         </div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+      >
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#1B3022]/40">Scroll</span>
+        <div className="w-px h-12 bg-gradient-to-b from-[#1B3022]/40 to-transparent" />
+      </motion.div>
     </section>
   )
 }

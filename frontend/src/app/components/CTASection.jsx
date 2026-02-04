@@ -1,51 +1,59 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight, Feather } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function CTASection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      </div>
+    <section className="py-32 bg-[#FCFBF7] relative overflow-hidden border-t border-[#1B3022]/5">
+      {/* Background Subtle Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1B3022]/5 to-transparent pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-        {/* Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="p-3 bg-white/10 rounded-full backdrop-blur-sm">
-            <Sparkles className="w-8 h-8" />
+        {/* Symbolic Icon */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="flex justify-center mb-10"
+        >
+          <div className="w-16 h-16 bg-[#1B3022] flex items-center justify-center rounded-none shadow-2xl">
+            <Feather className="w-8 h-8 text-[#FCFBF7]" />
           </div>
-        </div>
+        </motion.div>
 
         {/* Heading */}
-        <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-tight">
-          Transform Your Study Space Today
+        <h2 className="text-5xl md:text-6xl font-serif text-[#1B3022] mb-10 tracking-tight leading-tight">
+          Elevate Your <span className="italic font-light text-[#637D37]">Creative Process</span>
         </h2>
 
-        {/* Description */}
-        <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-          Discover our carefully curated collection of premium stationery designed to inspire your best work and elevate your productivity.
+        {/* Heritage Description */}
+        <p className="text-xl text-[#3A433E] mb-12 max-w-2xl mx-auto opacity-80 leading-relaxed font-medium">
+          Join a community of professionals who believe that fine instruments are the catalyst for exceptional ideas.
         </p>
 
-        {/* Offer Badge */}
-        <div className="inline-block px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-full text-green-300 text-sm font-medium mb-8">
-          Limited time: Free shipping on orders over ₹500
+        {/* Offer Detail */}
+        <div className="inline-flex items-center gap-3 px-6 py-2 bg-[#637D37]/10 border border-[#637D37]/20 mb-12">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1B3022]">Complimentary Atelier Shipping</span>
+          <div className="w-1 h-1 bg-[#637D37] rounded-full" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#637D37]">Orders Over ₹2,500</span>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        {/* Action Group */}
+        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
           <Link href="/#products">
-            <button className="group px-8 py-4 bg-white text-gray-900 rounded-xl font-medium hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform duration-200 flex items-center justify-center gap-2">
-              Explore Collection
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            <motion.button
+              whileHover={{ y: -4, shadow: "0 20px 40px rgba(27, 48, 34, 0.2)" }}
+              whileTap={{ scale: 0.98 }}
+              className="px-12 py-5 bg-[#1B3022] text-[#FCFBF7] font-serif text-lg flex items-center gap-3 transition-all"
+            >
+              Begin Your Collection
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
           </Link>
-          <Link href="/#products">
-            <button className="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-xl font-medium hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-              Browse Catalog
-            </button>
+          <Link href="/about" className="text-[#1B3022] font-black uppercase text-[10px] tracking-[0.3em] border-b-2 border-[#1B3022] pb-1 hover:text-[#637D37] hover:border-[#637D37] transition-all">
+            The Atelier Story
           </Link>
         </div>
       </div>

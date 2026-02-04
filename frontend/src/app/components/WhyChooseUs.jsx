@@ -1,67 +1,65 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { GraduationCap, Award, Users, Truck } from "lucide-react"
+import { Feather, ShieldCheck, Map, Clock } from "lucide-react"
 
 export default function WhyChooseUs() {
   const features = [
     {
-      icon: GraduationCap,
-      title: "Academic Excellence",
-      description:
-        "Meticulously curated study accessories designed to enhance your learning experience and academic performance.",
+      icon: Feather,
+      title: "Artisanal Heritage",
+      description: "Every piece is selected for its connection to a rich legacy of craftsmanship and functional design.",
       number: "01",
     },
     {
-      icon: Award,
-      title: "Premium Quality",
-      description:
-        "Exceptional craftsmanship meets functional design. Every product undergoes rigorous quality testing.",
+      icon: ShieldCheck,
+      title: "Proven Quality",
+      description: "Meticulously tested for durability and performance by professionals who demand the absolute best.",
       number: "02",
     },
     {
-      icon: Users,
-      title: "Student Community",
-      description: "Join a thriving community of ambitious students who trust StudyStuff for their academic journey.",
+      icon: Map,
+      title: "Curated Origin",
+      description: "Directly sourced from dedicated workshops and independent artisans across the subcontinent.",
       number: "03",
     },
     {
-      icon: Truck,
-      title: "Fast Delivery",
-      description: "Quick and reliable shipping across India. Track your order every step of the way.",
+      icon: Clock,
+      title: "Priority Concierge",
+      description: "Experience premium white-glove shipping and support, ensuring your collection arrives in pristine state.",
       number: "04",
     },
   ]
 
   return (
-    <section className="py-24 bg-gray-50 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[length:32px_32px]" />
+    <section className="py-32 bg-[#FCFBF7] relative overflow-hidden">
+      {/* Background Subtle Lines */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <div className="absolute top-0 right-[20%] w-px h-full bg-[#1B3022]" />
+        <div className="absolute top-0 right-[40%] w-px h-full bg-[#1B3022]" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-24"
         >
-          <span className="text-sm font-medium uppercase text-gray-500 mb-4 block tracking-widest">
-            Excellence Redefined
+          <span className="text-[10px] font-black uppercase text-[#637D37] mb-6 block tracking-[0.4em]">
+            The Heritage Standard
           </span>
-          <h2 className="text-4xl font-light text-gray-900 tracking-tight">
-            Why Choose <span className="font-normal text-gray-900">StudyStuff</span>
+          <h2 className="text-5xl font-serif text-[#1B3022] tracking-tight mb-8">
+            The Philosophy of <span className="italic font-light text-[#637D37]">Quality</span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
-            Transform your academic journey with thoughtfully designed accessories that inspire excellence.
+          <p className="text-xl text-[#3A433E] max-w-2xl mx-auto opacity-70 leading-relaxed font-medium">
+            We believe that the tools we use define the depth of our creative output.
           </p>
         </motion.div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        {/* Feature Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -69,30 +67,21 @@ export default function WhyChooseUs() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
+              className="group flex flex-col"
             >
-              <Card className="group relative bg-white hover:shadow-xl transition-all duration-500 border-gray-100 h-full">
-                <CardContent className="p-8">
-                  {/* Number */}
-                  <div className="absolute top-6 right-6 text-5xl font-light text-gray-100 group-hover:text-gray-200 transition-colors">
-                    {feature.number}
-                  </div>
+              {/* Number/Icon Row */}
+              <div className="flex items-end justify-between mb-8 pb-4 border-b border-[#1B3022]/10 transition-colors group-hover:border-[#637D37]/30">
+                <div className="w-12 h-12 bg-[#1B3022]/5 rounded-none flex items-center justify-center transition-colors group-hover:bg-[#1B3022] group-hover:text-[#FCFBF7]">
+                  <feature.icon className="w-5 h-5" />
+                </div>
+                <span className="text-4xl font-serif text-[#1B3022]/10 group-hover:text-[#637D37]/20 transition-colors">{feature.number}</span>
+              </div>
 
-                  {/* Icon */}
-                  <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                    className="mb-6"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-gray-100 group-hover:bg-gray-900 flex items-center justify-center transition-all duration-300">
-                      <feature.icon className="w-7 h-7 text-gray-900 group-hover:text-white transition-colors duration-300" />
-                    </div>
-                  </motion.div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-medium mb-3 text-gray-900">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">{feature.description}</p>
-                </CardContent>
-              </Card>
+              {/* Text */}
+              <h3 className="text-xl font-serif text-[#1B3022] mb-4 group-hover:text-[#637D37] transition-colors">{feature.title}</h3>
+              <p className="text-[#3A433E] leading-relaxed text-sm opacity-70 font-medium group-hover:opacity-100 transition-opacity">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>

@@ -1,7 +1,7 @@
 "use client"
 import { useCart } from "@/contexts/CartContext"
 import { useWishlist } from "@/contexts/WishlistContext"
-import { Plus, Minus, Heart, ShoppingCart, Eye } from "lucide-react"
+import { Plus, Minus, Heart, ShoppingBag, Eye, Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -15,98 +15,85 @@ export default function ProductCard({ product }) {
 
   return (
     <motion.div
-      whileHover={{ y: -8 }}
-      className="group relative bg-[#0f172a]/40 backdrop-blur-xl rounded-2xl border border-white/5 overflow-hidden transition-all duration-500 hover:border-[#637D37]/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="group flex flex-col pt-4"
     >
-      {/* Visual Asset Container */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#1e293b]/50">
+      {/* Editorial Visual Frame */}
+      <Link href={`/product/${product.id}`} className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F0] mb-6">
         <Image
           src={product.imageUrl || product.image || "/placeholder.jpg"}
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          className="object-cover transition-transform duration-[1200ms] group-hover:scale-105"
         />
 
-        {/* Intelligence Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+        {/* Minimalist Favoriting Overlay */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product);
+          }}
+          className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm border border-[#1B3022]/5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white"
+        >
+          <Heart className={`w-4 h-4 ${isFavorited ? 'fill-[#637D37] text-[#637D37]' : 'text-[#1B3022]/40'}`} />
+        </button>
 
-        <div className="absolute top-4 right-4 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleWishlist(product);
-            }}
-            className={`p-2.5 rounded-xl backdrop-blur-md border border-white/10 transition-colors ${isFavorited ? 'bg-red-500/20 text-red-500 grow' : 'bg-white/5 text-white/70 hover:text-white'
-              }`}
-          >
-            <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
-          </button>
-
-          <Link href={`/product/${product.id}`} className="p-2.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl text-white/70 hover:text-white transition-colors">
-            <Eye className="w-5 h-5" />
-          </Link>
-        </div>
-
-        {/* Family Badge */}
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 bg-[#637D37]/20 backdrop-blur-md border border-[#637D37]/30 text-[#8baf4e] text-[10px] font-bold tracking-widest uppercase rounded-md shadow-lg">
-            {product.family || 'Stationery'}
+        {/* Collection Badge */}
+        <div className="absolute bottom-4 left-4">
+          <span className="px-3 py-1 bg-[#1B3022] text-[#FCFBF7] text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
+            {product.family || 'The Archive'}
           </span>
         </div>
-      </div>
+      </Link>
 
-      {/* Content Area */}
-      <div className="p-5">
-        <Link href={`/product/${product.id}`}>
-          <h3 className="text-white font-medium mb-3 line-clamp-1 group-hover:text-[#8baf4e] transition-colors">
-            {product.name}
-          </h3>
-        </Link>
-
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex flex-col">
-            <span className="text-white font-bold text-xl tracking-tight">₹{product.price}</span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-widest">Premium Unit</span>
-          </div>
-
-          {product.stock > 0 ? (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 rounded-md border border-green-500/20">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-bold text-green-500 uppercase tracking-tighter">Verified Stock</span>
-            </div>
-          ) : (
-            <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-2 py-0.5 bg-red-500/10 rounded-md border border-red-500/20">Restocking</span>
-          )}
+      {/* Content Layer */}
+      <div className="flex flex-col flex-1">
+        <div className="flex justify-between items-start mb-2">
+          <Link href={`/product/${product.id}`} className="flex-1">
+            <h3 className="font-serif text-lg text-[#1B3022] leading-tight group-hover:text-[#637D37] transition-colors line-clamp-2">
+              {product.name}
+            </h3>
+          </Link>
+          <span className="font-serif text-lg text-[#1B3022] ml-4">₹{product.price}</span>
         </div>
 
-        {/* Transaction Control */}
-        <div className="relative">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center text-[#637D37]">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-2.5 h-2.5 fill-current" />
+            ))}
+          </div>
+          <span className="text-[10px] text-[#1B3022]/40 font-black uppercase tracking-widest">Masterpiece Quality</span>
+        </div>
+
+        {/* Modular Action Bar */}
+        <div className="mt-auto pt-4 border-t border-[#1B3022]/5">
           {count === 0 ? (
             <motion.button
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => addItem(product)}
               disabled={product.stock === 0}
-              className="w-full h-12 flex items-center justify-center gap-2 bg-white text-[#0f172a] rounded-xl font-bold text-sm tracking-wide disabled:opacity-20 transition-all hover:bg-[#8baf4e] hover:text-white group/btn"
+              className="w-full h-12 flex items-center justify-between px-6 bg-[#FCFBF7] border border-[#1B3022]/10 text-[#1B3022] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#1B3022] hover:text-[#FCFBF7] hover:border-[#1B3022] transition-all disabled:opacity-20 group/btn"
             >
-              <ShoppingCart className="w-4 h-4" />
-              INITIALIZE ORDER
+              <span className="relative z-10">{product.stock === 0 ? 'Restocking Piece' : 'Acquire Current Piece'}</span>
+              <ShoppingBag className="w-3.5 h-3.5" />
             </motion.button>
           ) : (
-            <div className="flex items-center justify-between h-12 bg-white/5 border border-white/10 rounded-xl p-1 overflow-hidden">
+            <div className="flex items-center justify-between h-12 bg-[#F5F5F0] px-1">
               <button
                 onClick={() => removeItem(product.name)}
-                className="w-10 h-full flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-lg text-white transition-colors"
+                className="w-10 h-10 flex items-center justify-center hover:bg-white text-[#1B3022] transition-colors"
               >
-                <Minus className="w-4 h-4" />
+                <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="text-white font-bold text-lg tabular-nums">{count}</span>
+              <span className="font-serif text-lg text-[#1B3022] tabular-nums">{count}</span>
               <button
                 onClick={() => addItem(product)}
-                className="w-10 h-full flex items-center justify-center bg-[#637D37] hover:bg-[#8baf4e] rounded-lg text-white transition-colors"
+                className="w-10 h-10 flex items-center justify-center bg-[#1B3022] text-[#FCFBF7] transition-colors"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
           )}

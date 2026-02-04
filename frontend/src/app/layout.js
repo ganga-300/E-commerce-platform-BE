@@ -1,4 +1,4 @@
-import { Outfit, Inter } from "next/font/google";
+import { Outfit, Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from '../contexts/CartContext.js';
@@ -19,15 +19,22 @@ const inter = Inter({
   display: "swap",
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata = {
-  title: 'StudyStuff',
-  description: 'Stationery supplies made easy',
+  title: 'StudyStuff | Fine Stationery Artisans',
+  description: 'A curated collection of premium instruments for the discerning professional.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable} ${inter.variable} antialiased font-body`}>
+      <body className={`${outfit.variable} ${inter.variable} ${cormorant.variable} antialiased font-body`}>
         <AuthProvider>
           <ToastProvider>
             <WishlistProvider>

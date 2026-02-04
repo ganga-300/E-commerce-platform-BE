@@ -1,16 +1,16 @@
 "use client"
 import { useState, useEffect } from "react"
 import ProductCard from "./ProductCard"
-import { Loader2, Zap } from "lucide-react"
+import { Loader2, Feather, Filter } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const DEFAULT_CATEGORIES = [
-  { id: "all", name: "All Intelligence" },
-  { id: "STATIONERY", name: "Stationery" },
-  { id: "CRAFT", name: "Crafts" },
-  { id: "ART SUPPLIES", name: "Art Supplies" },
-  { id: "OFFICE", name: "Office" },
-  { id: "BOOKS", name: "Books" }
+  { id: "all", name: "All Collections" },
+  { id: "STATIONERY", name: "Fine Stationery" },
+  { id: "CRAFT", name: "Artisanal Crafts" },
+  { id: "ART SUPPLIES", name: "Premium Pigments" },
+  { id: "OFFICE", name: "Executive Suite" },
+  { id: "BOOKS", name: "Limited Prints" }
 ]
 
 export default function ProductsSection() {
@@ -42,72 +42,80 @@ export default function ProductsSection() {
   }, [activeCategory])
 
   return (
-    <section id="products" className="relative py-32 px-6 bg-[#020617] overflow-hidden">
-      {/* Ambient Lighting Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#637D37]/5 rounded-full blur-[120px] pointer-events-none" />
+    <section id="products" className="relative py-32 px-6 bg-white overflow-hidden">
+      {/* Subtle Background Detail */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#1B3022]/10 to-transparent" />
 
       <div className="relative max-w-7xl mx-auto">
-        {/* Intelligence Header */}
+        {/* Gallery Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-24"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#637D37]/10 border border-[#637D37]/20 rounded-lg mb-6">
-            <Zap className="w-4 h-4 text-[#8baf4e]" />
-            <span className="text-xs font-bold text-[#8baf4e] tracking-widest uppercase">The Catalog Feed</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#637D37]/5 rounded-none mb-6">
+            <Feather className="w-3.5 h-3.5 text-[#637D37]" />
+            <span className="text-[10px] font-black text-[#637D37] tracking-[0.3em] uppercase">The Curated Collection</span>
           </div>
-          <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tighter mb-6">
-            Engineered For <span className="text-[#8baf4e]">Excellence</span>
+          <h2 className="text-5xl md:text-6xl font-serif text-[#1B3022] tracking-tight mb-8">
+            Instruments for <span className="italic font-light text-[#637D37]">Discovery</span>
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
-            Browse our high-fidelity collection of premium tools, curated for the modern architectural and creative workspace.
+          <p className="text-xl text-[#3A433E] max-w-2xl mx-auto font-medium opacity-80 leading-relaxed">
+            A selection of fine tools and artifacts chosen for their quality, heritage, and functional beauty.
           </p>
         </motion.div>
 
-        {/* Glassmorphic Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 mb-16">
+        {/* Minimalist Category Navigation */}
+        <div className="flex flex-wrap justify-center items-center gap-8 mb-20 border-b border-[#1B3022]/5 pb-10">
           {categories.map((cat) => (
-            <motion.button
+            <button
               key={cat.id}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-8 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 border ${activeCategory === cat.id
-                  ? "bg-[#637D37] text-white border-[#637D37] shadow-[0_0_20px_rgba(99,125,55,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10 hover:border-white/20 hover:bg-white/10 backdrop-blur-md"
+              className={`relative px-2 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 ${activeCategory === cat.id
+                  ? "text-[#1B3022]"
+                  : "text-[#1B3022]/40 hover:text-[#1B3022]"
                 }`}
             >
               {cat.name}
-            </motion.button>
+              {activeCategory === cat.id && (
+                <motion.div
+                  layoutId="catUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#637D37]"
+                />
+              )}
+            </button>
           ))}
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#1B3022]/10 rounded-full text-[10px] font-black uppercase tracking-widest text-[#1B3022]/60 hover:bg-[#1B3022]/5 transition-colors">
+            <Filter className="w-3 h-3" />
+            Sort By
+          </button>
         </div>
 
-        {/* Dynamic Products Feed */}
+        {/* Art Gallery Grid */}
         <div className="relative min-h-[400px]">
           {loading ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="w-10 h-10 animate-spin text-[#637D37]" />
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-32 bg-white/5 rounded-3xl border border-dashed border-white/10">
-              <p className="text-slate-500 text-xl font-light italic">No high-fidelity products found in this intelligence layer.</p>
+            <div className="text-center py-40 border-t border-dashed border-[#1B3022]/10">
+              <p className="text-[#3A433E] text-xl font-serif italic italic opacity-60">No pieces currently showcased in this collection layer.</p>
             </div>
           ) : (
             <motion.div
               layout
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"
             >
               <AnimatePresence mode="popLayout">
                 {products.map((product) => (
                   <motion.div
                     key={product.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.4 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
                   >
                     <ProductCard product={product} />
                   </motion.div>

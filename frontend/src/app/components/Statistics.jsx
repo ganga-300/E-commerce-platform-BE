@@ -2,36 +2,36 @@
 
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
-import { Users, Package, Award, Star } from "lucide-react"
+import { Users, Package, MapPin, Feather } from "lucide-react"
 
 const statistics = [
     {
         id: 1,
         icon: Users,
-        value: 10000,
+        value: 12400,
         suffix: "+",
-        label: "Happy Customers"
+        label: "Discerning Clients"
     },
     {
         id: 2,
         icon: Package,
-        value: 500,
+        value: 850,
         suffix: "+",
-        label: "Products"
+        label: "Masterpiece Artifacts"
     },
     {
         id: 3,
-        icon: Award,
-        value: 50,
-        suffix: "+",
-        label: "Brands"
+        icon: MapPin,
+        value: 18,
+        suffix: "",
+        label: "Artisan Regions"
     },
     {
         id: 4,
-        icon: Star,
-        value: 4.8,
-        suffix: "★",
-        label: "Average Rating"
+        icon: Feather,
+        value: 100,
+        suffix: "%",
+        label: "Handcrafted Origin"
     }
 ]
 
@@ -79,40 +79,43 @@ function Counter({ value, suffix }) {
     }, [value, hasAnimated])
 
     return (
-        <span ref={ref} className="text-5xl font-light">
-            {value % 1 === 0 ? count : count.toFixed(1)}{suffix}
+        <span ref={ref} className="text-6xl font-serif text-[#FCFBF7]">
+            {value % 1 === 0 ? count.toLocaleString() : count.toFixed(1)}{suffix}
         </span>
     )
 }
 
 export default function Statistics() {
     return (
-        <section className="py-20 bg-gray-900 text-white">
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+        <section className="py-32 bg-[#1B3022] relative overflow-hidden">
+            {/* Elegant Background Decor */}
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#FCFBF7_1px,transparent_1px)] bg-[length:48px_48px]" />
+            </div>
+
+            <div className="max-w-7xl mx-auto px-6 relative z-10">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-16">
                     {statistics.map((stat, index) => (
                         <motion.div
                             key={stat.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="text-center"
+                            transition={{ delay: index * 0.1, duration: 0.8 }}
+                            className="flex flex-col items-center text-center"
                         >
-                            {/* Icon */}
-                            <div className="flex justify-center mb-4">
-                                <div className="p-4 bg-white/10 rounded-full backdrop-blur-sm">
-                                    <stat.icon className="w-8 h-8" />
-                                </div>
+                            {/* Icon Detail */}
+                            <div className="mb-8 p-4 bg-[#FCFBF7]/5 border border-[#FCFBF7]/10 rounded-full flex items-center justify-center text-[#637D37]">
+                                <stat.icon className="w-6 h-6" />
                             </div>
 
-                            {/* Number */}
-                            <div className="mb-2">
+                            {/* Counter Value */}
+                            <div className="mb-4">
                                 <Counter value={stat.value} suffix={stat.suffix} />
                             </div>
 
-                            {/* Label */}
-                            <p className="text-white/60 text-sm font-medium">
+                            {/* Refined Label */}
+                            <p className="text-[#FCFBF7]/40 text-[10px] font-black uppercase tracking-[0.3em] font-serif">
                                 {stat.label}
                             </p>
                         </motion.div>
