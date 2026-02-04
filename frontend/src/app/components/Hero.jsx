@@ -73,7 +73,7 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-center mb-10">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -81,23 +81,23 @@ export default function Hero() {
               className="inline-flex items-center gap-4 px-6 py-2 bg-[#1B3022] text-[#FCFBF7] text-[10px] font-black uppercase tracking-[0.2em] rounded-full"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              India's Premier Stationery Marketplace
+              Your Online Stationery Store
             </motion.div>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-serif text-[#1B3022] leading-[1] mb-8 tracking-tight">
-            Curated Stationery <br />
-            <span className="italic font-light text-[#637D37] md:ml-12">& Art Supplies</span>
+          <h1 className="text-5xl md:text-7xl font-serif text-[#1B3022] leading-[1.1] mb-8 tracking-tight">
+            Notebooks. Pens. <br />
+            <span className="italic font-light text-[#637D37]">Colors & Craft.</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-[#3A433E] font-sans font-light leading-relaxed max-w-4xl mx-auto mb-10 opacity-90">
-            Shop the finest collection of <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">Notebooks</span>, <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">High-Performance Pens</span>, and <span className="font-serif text-3xl md:text-4xl text-[#1B3022] italic">Professional Craft Materials</span>.
-            <span className="block mt-6 text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#1B3022]/60">Designed for students, artists, and creators</span>
+          <p className="text-xl text-[#3A433E] font-sans font-light leading-relaxed max-w-4xl mx-auto mb-10 opacity-90">
+            The complete marketplace for all your supplies. Buy <span className="font-serif text-2xl text-[#1B3022] italic">School Essentials</span>, <span className="font-serif text-2xl text-[#1B3022] italic">Office Stationery</span>, and <span className="font-serif text-2xl text-[#1B3022] italic">Professional Art Gear</span> online.
+            <span className="block mt-4 text-sm font-bold uppercase tracking-[0.2em] text-[#1B3022]/60">Everything delivered to your doorstep</span>
           </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-12 opacity-60">
-            {["Premium Notebooks", "Fine Writing", "Art Essentials", "Office Gear", "Craft Kits"].map((item, i) => (
-              <span key={i} className="px-3 py-1 border border-[#1B3022]/20 rounded-full text-[10px] uppercase tracking-widest text-[#1B3022] font-bold">
+          <div className="flex flex-wrap justify-center gap-3 mb-10 opacity-80">
+            {["Notebooks", "Fountain Pens", "Sketchbooks", "Paints", "Glues & Tapes", "Geometry Sets"].map((item, i) => (
+              <span key={i} className="px-4 py-2 bg-white border border-[#1B3022]/10 rounded-lg text-xs uppercase tracking-wider text-[#1B3022] font-bold shadow-sm">
                 {item}
               </span>
             ))}
