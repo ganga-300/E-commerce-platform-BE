@@ -5,13 +5,7 @@ import { Loader2 } from "lucide-react"
 
 export default function ProductsSection() {
   const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([
-    { id: "all", name: "All Products" },
-    { id: "stationery", name: "Stationery" },
-    { id: "books", name: "Books" },
-    { id: "office", name: "Office" },
-    { id: "crafts", name: "Crafts" }
-  ])
+  const [categories, setCategories] = useState([])
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
 
@@ -23,14 +17,24 @@ export default function ProductsSection() {
         if (res.ok) {
           const data = await res.json()
           console.log("Fetched categories:", data)
-          // Only update if we got valid data
-          if (data && data.length > 0) {
-            setCategories([{ id: "all", name: "All Products" }, ...data])
-          }
+          // Build categories array with "All" option first
+          const allCategories = [
+            { id: "all", name: "All Products", slug: "all" },
+            ...data.map(cat => ({
+              id: cat.id,
+              name: cat.name,
+              slug: cat.slug || cat.name.toLowerCase()
+            }))
+          ]
+          setCategories(allCategories)
+        } else {
+          // Fallback to defaults if API fails
+          setCategories([{ id: "all", name: "All Products", slug: "all" }])
         }
       } catch (err) {
         console.error("Categories fetch error:", err)
-        // Keep default categories on error
+        // Fallback to defaults
+        setCategories([{ id: "all", name: "All Products", slug: "all" }])
       }
     }
     fetchCategories()
@@ -43,13 +47,19 @@ export default function ProductsSection() {
       try {
         let url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`
 
+        // For filtering, use the category name (not ID or slug)
         if (activeCategory !== "all") {
-          url += `?category=${activeCategory}`
+          const selectedCat = categories.find(c => c.id === activeCategory || c.slug === activeCategory)
+          if (selectedCat && selectedCat.name !== "All Products") {
+            url += `?category=${selectedCat.name}`
+          }
         }
 
+        console.log("Fetching products from:", url)
         const res = await fetch(url)
         if (res.ok) {
           const data = await res.json()
+          console.log("Fetched products:", data.length)
           setProducts(data)
         }
       } catch (err) {
@@ -59,8 +69,10 @@ export default function ProductsSection() {
       }
     }
 
-    fetchProducts()
-  }, [activeCategory])
+    if (categories.length > 0) {
+      fetchProducts()
+    }
+  }, [activeCategory, categories])
 
   return (
     <section className="py-20 px-6 bg-white">
@@ -76,20 +88,22 @@ export default function ProductsSection() {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
-                ? "bg-gray-900 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
+        {categories.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Products Grid - 5 columns for smaller cards */}
         {loading ? (
