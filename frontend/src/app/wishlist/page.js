@@ -1,21 +1,18 @@
 "use client"
 import React from 'react'
 import { useWishlist } from '@/contexts/WishlistContext'
-import { useCart } from '@/contexts/CartContext'
 import ProductCard from '@/app/components/ProductCard'
-import { Heart, ShoppingBag, ShoppingCart, Trash2 } from 'lucide-react'
+import { Heart, ShoppingBag, X } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 
 export default function WishlistPage() {
     const { wishlistItems, removeFromWishlist } = useWishlist()
-    const { addItem } = useCart()
 
-    const handleMoveToCart = (product) => {
-        addItem(product)
+    const handleRemove = (product) => {
         removeFromWishlist(product.id)
-        toast.success(`${product.name} moved to cart!`)
+        toast.success(`${product.name} removed from wishlist`)
     }
 
     return (
@@ -68,29 +65,16 @@ export default function WishlistPage() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.8 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="w-full max-w-sm"
+                                    className="w-full max-w-sm relative group"
                                 >
-                                    <div className="relative group">
-                                        <ProductCard product={product} />
-                                        <div className="mt-4 flex gap-2">
-                                            <button
-                                                onClick={() => handleMoveToCart(product)}
-                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#637D37] text-white rounded-xl font-bold text-sm hover:bg-[#52682d] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                                            >
-                                                <ShoppingCart className="w-4 h-4" />
-                                                Move to Cart
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    removeFromWishlist(product.id)
-                                                    toast.success(`${product.name} removed from wishlist`)
-                                                }}
-                                                className="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-100 transition-all"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <ProductCard product={product} />
+                                    <button
+                                        onClick={() => handleRemove(product)}
+                                        className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm hover:bg-red-50 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all z-10 group-hover:scale-110"
+                                        title="Remove from wishlist"
+                                    >
+                                        <X className="w-5 h-5 text-gray-600 hover:text-red-600 transition-colors" />
+                                    </button>
                                 </motion.div>
                             ))}
                         </div>
