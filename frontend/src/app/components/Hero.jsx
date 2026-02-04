@@ -60,7 +60,7 @@ export default function Hero() {
           <div className="relative bg-gray-50 flex items-center justify-center p-12 lg:p-20">
             <div className="relative w-full max-w-xl aspect-square">
               <Image
-                src="/artifacts/hero_stationery_image.webp"
+                src="/hero-stationery.png"
                 alt="Premium Stationery Collection"
                 fill
                 className="object-cover"
