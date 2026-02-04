@@ -12,8 +12,8 @@ import {
   Star,
   RefreshCw,
 } from "lucide-react"
-import { useAuth } from "../../contexts/AuthContext"
-import { useCart } from "../../contexts/CartContext"
+import { useAuth } from "@/contexts/AuthContext"
+import { useCart } from "@/contexts/CartContext"
 import { indianStates } from "../../data/indianStates"
 import { toast } from "sonner"
 

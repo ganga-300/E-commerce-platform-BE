@@ -18,7 +18,7 @@ import {
     X,
     TrendingUp
 } from "lucide-react"
-import { useAuth } from "../../../contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 
 const navItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut, ShoppingCart, ListChecks, CheckCircle2, Truck, AlertCircle, FileDown } from "lucide-react"
 import { generatePackingSlip } from "../../utils/pdfGenerator"
 import Script from "next/script"
@@ -717,8 +717,8 @@ export default function SellerDashboard() {
                                     <button
                                         onClick={() => setShowLowStock(!showLowStock)}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border ${showLowStock
-                                                ? 'bg-red-50 border-red-200 text-red-600 shadow-sm shadow-red-100'
-                                                : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                                            ? 'bg-red-50 border-red-200 text-red-600 shadow-sm shadow-red-100'
+                                            : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
                                             }`}
                                     >
                                         <AlertCircle className={`w-4 h-4 ${showLowStock ? 'animate-pulse' : ''}`} />

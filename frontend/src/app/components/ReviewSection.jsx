@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Star, MessageSquare, ThumbsUp, Loader2, User, Trash2 } from "lucide-react"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/contexts/ToastContext"
 
 export default function ReviewSection({ productId }) {
     const { user, token } = useAuth()

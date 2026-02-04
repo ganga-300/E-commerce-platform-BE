@@ -5,7 +5,7 @@ import Navbar from "../features/shared/components/Navbar"
 import Footer from "../features/shared/components/Footer"
 import { CommandMenu } from "@/components/CommandMenu"
 import IntelligenceSidebar from "../admin/intelligence/IntelligenceSidebar"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { useState } from "react"
 import { Menu } from "lucide-react"
 

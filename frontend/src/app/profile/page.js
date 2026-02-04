@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -143,8 +143,8 @@ export default function ProfilePage() {
                             <button
                                 onClick={() => setActiveTab("profile")}
                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 font-bold text-sm ${activeTab === "profile"
-                                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                     }`}
                             >
                                 <User className="w-5 h-5" />
@@ -153,8 +153,8 @@ export default function ProfilePage() {
                             <button
                                 onClick={() => setActiveTab("addresses")}
                                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 font-bold text-sm ${activeTab === "addresses"
-                                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                     }`}
                             >
                                 <MapPin className="w-5 h-5" />
