@@ -61,9 +61,8 @@ export default function MegaMenu() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] pt-4 z-50"
+                        className="absolute top-full left-0 w-[800px] pt-4 z-50"
                     >
                         <div className="bg-white border border-[#1B3022]/10 rounded-2xl shadow-[0_20px_50px_rgba(27,48,34,0.1)] overflow-hidden p-8 grid grid-cols-12 gap-8 relative">
                             {/* Decorative Top Line */}
