@@ -29,6 +29,7 @@ export default function ProductDetailsClient({ product }) {
     const { toggleWishlist, isInWishlist } = useWishlist()
     const { showToast } = useToast()
     const [localQty, setLocalQty] = useState(1)
+    const [selectedImage, setSelectedImage] = useState(product.imageUrl)
 
     if (!product) return null
 
@@ -64,15 +65,15 @@ export default function ProductDetailsClient({ product }) {
             <div className="max-w-7xl mx-auto px-6 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
                     {/* Image Section */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 space-y-4">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="relative w-full max-w-md mx-auto aspect-square bg-gray-50 rounded-lg overflow-hidden group"
+                            className="relative w-full aspect-square bg-[#FAFAF8] rounded-3xl overflow-hidden group border border-gray-100 shadow-sm"
                         >
                             <div className="absolute inset-0 p-8">
                                 <Image
-                                    src={product.imageUrl || "/placeholder.jpg"}
+                                    src={selectedImage || product.imageUrl || "/placeholder.jpg"}
                                     alt={product.name}
                                     fill
                                     className="object-contain transition-transform duration-700 group-hover:scale-105"
@@ -81,14 +82,37 @@ export default function ProductDetailsClient({ product }) {
                             </div>
                             <button
                                 onClick={() => toggleWishlist(product)}
-                                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${isFavorited
-                                        ? 'bg-white text-red-500'
-                                        : 'bg-white/40 text-gray-700 hover:bg-white/60'
+                                className={`absolute top-6 right-6 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-sm ${isFavorited
+                                    ? 'bg-white text-red-500 hover:scale-110'
+                                    : 'bg-white/60 text-gray-700 hover:bg-white hover:text-red-400'
                                     }`}
                             >
-                                <Heart className={`w-4.5 h-4.5 ${isFavorited ? 'fill-current' : ''}`} />
+                                <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
                             </button>
                         </motion.div>
+
+                        {/* Thumbnails */}
+                        {product.images && product.images.length > 0 && (
+                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                                <button
+                                    onClick={() => setSelectedImage(product.imageUrl)}
+                                    className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all flex-shrink-0 bg-white ${selectedImage === product.imageUrl ? 'border-[#637D37] ring-2 ring-[#637D37]/10' : 'border-gray-100'
+                                        }`}
+                                >
+                                    <Image src={product.imageUrl} alt="Thumbnail" fill className="object-contain p-2" />
+                                </button>
+                                {product.images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelectedImage(img)}
+                                        className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all flex-shrink-0 bg-white ${selectedImage === img ? 'border-[#637D37] ring-2 ring-[#637D37]/10' : 'border-gray-100'
+                                            }`}
+                                    >
+                                        <Image src={img} alt={`Thumbnail ${idx}`} fill className="object-contain p-2" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Product Info */}

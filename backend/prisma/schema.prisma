@@ -60,6 +60,7 @@ model Product {
   sku           String   @unique
   family        String?
   imageUrl      String
+  images        String[] @default([])
   categoryId    String?
   averageRating Float?   @default(0)
   reviewCount   Int      @default(0)

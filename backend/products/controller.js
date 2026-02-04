@@ -3,9 +3,9 @@ const { createProductsFromDB, searchProductsInDB, getProductsFromId, getProducts
 async function createProducts(req, res) {
   try {
 
-    const { name, description, price, stock, sku, family, imageUrl } = req.body
+    const { name, description, price, stock, sku, family, imageUrl, images } = req.body
     const sellerId = req.userId; // Extracted from verifyToken middleware
-    const product = await createProductsFromDB({ name, description, price, stock, sku, family, imageUrl, sellerId });
+    const product = await createProductsFromDB({ name, description, price, stock, sku, family, imageUrl, images, sellerId });
     res.json(product)
 
   } catch (error) {

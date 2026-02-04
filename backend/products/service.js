@@ -1,9 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-async function createProductsFromDB({ name, description, price, stock, sku, family, imageUrl, sellerId }) {
+async function createProductsFromDB({ name, description, price, stock, sku, family, imageUrl, images, sellerId }) {
   const product = await prisma.product.create({
-    data: { name, description, price, stock, sku, family, imageUrl, sellerId }
+    data: { name, description, price, stock, sku, family, imageUrl, images, sellerId }
   })
   return product
 }

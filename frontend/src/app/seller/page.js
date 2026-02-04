@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut, ShoppingCart, ListChecks, CheckCircle2, Truck, AlertCircle } from "lucide-react"
+import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut, ShoppingCart, ListChecks, CheckCircle2, Truck, AlertCircle, FileDown } from "lucide-react"
+import { generatePackingSlip } from "../../utils/pdfGenerator"
 import Script from "next/script"
 
 export default function SellerDashboard() {
@@ -22,6 +23,7 @@ export default function SellerDashboard() {
     const [activeTab, setActiveTab] = useState("inventory") // inventory or orders
     const [sellerOrders, setSellerOrders] = useState([])
     const [ordersLoading, setOrdersLoading] = useState(false)
+    const [showLowStock, setShowLowStock] = useState(false)
 
     const fetchAnalytics = async () => {
         try {
@@ -126,6 +128,7 @@ export default function SellerDashboard() {
     const [sku, setSku] = useState("")
     const [family, setFamily] = useState("")
     const [imageUrl, setImageUrl] = useState("")
+    const [galleryImages, setGalleryImages] = useState([])
 
     useEffect(() => {
         if (!authLoading) {
@@ -178,6 +181,31 @@ export default function SellerDashboard() {
         ).open();
     };
 
+    const handleGalleryUpload = () => {
+        if (!window.cloudinary) return;
+
+        window.cloudinary.openUploadWidget(
+            {
+                cloudName: "da8wt2pys",
+                uploadPreset: "btfgadxx",
+                sources: ["local", "url", "camera"],
+                multiple: true,
+                maxFiles: 5,
+                defaultSource: "local"
+            },
+            (error, result) => {
+                if (result && (result.event === "success" || result.event === "close")) {
+                    document.body.style.overflow = "auto";
+                    document.body.style.pointerEvents = "auto";
+                }
+
+                if (!error && result && result.event === "success") {
+                    setGalleryImages(prev => [...prev, result.info.secure_url]);
+                }
+            }
+        ).open();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
@@ -197,7 +225,8 @@ export default function SellerDashboard() {
                     stock: parseInt(stock),
                     sku,
                     family,
-                    imageUrl
+                    imageUrl,
+                    images: galleryImages
                 })
             })
 
@@ -216,6 +245,7 @@ export default function SellerDashboard() {
             setSku("")
             setFamily("")
             setImageUrl("")
+            setGalleryImages([])
             fetchMyProducts() // Refresh list
 
         } catch (err) {
@@ -234,6 +264,7 @@ export default function SellerDashboard() {
         setSku(product.sku)
         setFamily(product.family || "")
         setImageUrl(product.imageUrl)
+        setGalleryImages(product.images || [])
         setShowEditModal(true)
     }
 
@@ -256,7 +287,8 @@ export default function SellerDashboard() {
                     stock: parseInt(stock),
                     sku,
                     family,
-                    imageUrl
+                    imageUrl,
+                    images: galleryImages
                 })
             })
 
@@ -277,6 +309,7 @@ export default function SellerDashboard() {
             setSku("")
             setFamily("")
             setImageUrl("")
+            setGalleryImages([])
             fetchMyProducts()
 
         } catch (err) {
@@ -396,7 +429,6 @@ export default function SellerDashboard() {
             <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="afterInteractive" />
             <div className="max-w-6xl mx-auto">
                 {/* Analytics Section stays at top */}
-                {/* Analytics Section */}
                 {analytics && (
                     <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
                         <div className="flex items-center justify-between mb-8">
@@ -490,406 +522,584 @@ export default function SellerDashboard() {
                     </div>
                 )}
 
-            </div>
+                {/* Navigation Tabs */}
+                <div className="flex gap-4 mb-12 border-b border-gray-200">
+                    <button
+                        onClick={() => setActiveTab("inventory")}
+                        className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "inventory" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <Package className="w-4 h-4" />
+                            Inventory
+                        </div>
+                        {activeTab === "inventory" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("orders")}
+                        className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "orders" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <ShoppingCart className="w-4 h-4" />
+                            Manage Orders
+                            {sellerOrders.length > 0 && (
+                                <span className="bg-[#637D37] text-white text-[10px] px-2 py-0.5 rounded-full ring-2 ring-white">
+                                    {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
+                                </span>
+                            )}
+                        </div>
+                        {activeTab === "orders" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
+                    </button>
+                </div>
+
+                {message && (activeTab === "inventory") && (
+                    <div className={`p-4 rounded-xl mb-6 font-bold shadow-sm border ${message.includes("Error") ? "bg-red-50 text-red-700 border-red-100" : "bg-emerald-50 text-emerald-700 border-emerald-100"}`}>
+                        {message}
+                    </div>
                 )}
 
-            {/* Navigation Tabs */}
-            <div className="flex gap-4 mb-12 border-b border-gray-200">
-                <button
-                    onClick={() => setActiveTab("inventory")}
-                    className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "inventory" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
-                >
-                    <div className="flex items-center gap-2">
-                        <Package className="w-4 h-4" />
-                        Inventory
+                {activeTab === "inventory" ? (
+                    <div className="space-y-12">
+                        <section>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                                <PlusCircle className="w-8 h-8 text-[#637D37]" />
+                                Add New Product
+                            </h1>
+
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea
+                                            required
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            rows={3}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                                            <input
+                                                type="number"
+                                                required
+                                                min="0"
+                                                value={price}
+                                                onChange={(e) => setPrice(e.target.value)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                                            <input
+                                                type="number"
+                                                required
+                                                min="0"
+                                                value={stock}
+                                                onChange={(e) => setStock(e.target.value)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">SKU (Unique ID)</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={sku}
+                                                onChange={(e) => setSku(e.target.value)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Category / Family</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={family}
+                                                onChange={(e) => setFamily(e.target.value)}
+                                                placeholder="e.g., Stationery"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Primary Image</label>
+                                            <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                                {imageUrl ? (
+                                                    <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                                                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setImageUrl("")}
+                                                            className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 transition h-8 w-8 flex items-center justify-center"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleUpload}
+                                                        className="flex flex-col items-center gap-3 text-gray-400 hover:text-[#637D37] transition py-8"
+                                                    >
+                                                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
+                                                            <Upload className="w-6 h-6" />
+                                                        </div>
+                                                        <span className="text-sm font-bold">Main Product Image</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Gallery Images (Max 5)</label>
+                                            <div className="grid grid-cols-3 gap-2 p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 min-h-[160px]">
+                                                {galleryImages.map((url, idx) => (
+                                                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                                                        <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setGalleryImages(prev => prev.filter((_, i) => i !== idx))}
+                                                            className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full hover:bg-red-500 transition"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                {galleryImages.length < 5 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleGalleryUpload}
+                                                        className="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-[#637D37] border-2 border-dashed border-gray-200 rounded-lg bg-white/50 hover:bg-white transition-all aspect-square"
+                                                    >
+                                                        <PlusCircle className="w-6 h-6" />
+                                                        <span className="text-[10px] font-black uppercase tracking-wider">Add</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold text-lg shadow-lg shadow-[#637D37]/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin" /> : "Create Product"}
+                                    </button>
+                                </form>
+                            </div>
+                        </section>
+
+                        <section>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">My Listings</h2>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => setShowLowStock(!showLowStock)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border ${showLowStock
+                                                ? 'bg-red-50 border-red-200 text-red-600 shadow-sm shadow-red-100'
+                                                : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <AlertCircle className={`w-4 h-4 ${showLowStock ? 'animate-pulse' : ''}`} />
+                                        {showLowStock ? "Showing Low Stock" : "Filter Low Stock"}
+                                    </button>
+                                </div>
+                            </div>
+                            {fetching ? (
+                                <div className="flex justify-center py-12">
+                                    <Loader2 className="animate-spin text-[#637D37]" />
+                                </div>
+                            ) : products.length === 0 ? (
+                                <div className="bg-white rounded-xl p-8 text-center border border-dashed border-gray-300 text-gray-500">
+                                    No products listed yet. Add your first product above!
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-gray-50 border-b border-gray-100">
+                                            <tr>
+                                                <th className="px-6 py-4 text-sm font-semibold text-gray-700">Product</th>
+                                                <th className="px-6 py-4 text-sm font-semibold text-gray-700">SKU</th>
+                                                <th className="px-6 py-4 text-sm font-semibold text-gray-700">Price</th>
+                                                <th className="px-6 py-4 text-sm font-semibold text-gray-700">Stock</th>
+                                                <th className="px-6 py-4 text-sm font-semibold text-gray-700">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {products
+                                                .filter(p => !showLowStock || p.stock < 5)
+                                                .map((p) => (
+                                                    <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${p.stock < 5 ? 'bg-red-50/30' : ''}`}>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100">
+                                                                    <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                                                                </div>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-sm font-bold text-gray-900">{p.name}</span>
+                                                                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{p.family}</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm text-gray-500 font-mono tracking-tight">{p.sku}</td>
+                                                        <td className="px-6 py-4 text-sm font-black text-[#637D37]">₹{p.price}</td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className={`text-sm font-black ${p.stock < 5 ? 'text-red-600' : 'text-gray-700'}`}>
+                                                                    {p.stock} units
+                                                                </span>
+                                                                {p.stock < 5 && (
+                                                                    <span className="text-[9px] font-black text-red-500 bg-red-100 px-2 py-0.5 rounded-full uppercase tracking-tighter w-fit">
+                                                                        Critical
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm">
+                                                            <button
+                                                                onClick={() => handleEdit(p)}
+                                                                className="text-blue-600 hover:text-blue-800 mr-3 inline-flex items-center gap-1"
+                                                            >
+                                                                <Edit2 className="w-4 h-4" />
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setProductToDelete(p)
+                                                                    setShowDeleteConfirm(true)
+                                                                }}
+                                                                className="text-red-600 hover:text-red-800 inline-flex items-center gap-1"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                                Delete
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </section>
                     </div>
-                    {activeTab === "inventory" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
-                </button>
-                <button
-                    onClick={() => setActiveTab("orders")}
-                    className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "orders" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
-                >
-                    <div className="flex items-center gap-2">
-                        <ShoppingCart className="w-4 h-4" />
-                        Manage Orders
-                        {sellerOrders.length > 0 && (
-                            <span className="bg-[#637D37] text-white text-[10px] px-2 py-0.5 rounded-full ring-2 ring-white">
-                                {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
-                            </span>
+                ) : (
+                    /* Orders Management Tab */
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-3xl font-black text-gray-900 tracking-tight">Order Fulfillment</h1>
+                                <p className="text-gray-500 font-medium italic">Manage status transitions and customer shipping info.</p>
+                            </div>
+                            <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-xs font-black border border-amber-100 flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4" />
+                                Action Required: {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
+                            </div>
+                        </div>
+
+                        {ordersLoading ? (
+                            <div className="flex justify-center py-20">
+                                <div className="w-12 h-12 border-4 border-[#637D37]/20 border-t-[#637D37] rounded-full animate-spin"></div>
+                            </div>
+                        ) : sellerOrders.length === 0 ? (
+                            <div className="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-gray-100">
+                                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                    <ListChecks className="text-gray-300 w-8 h-8" />
+                                </div>
+                                <h2 className="text-xl font-black text-gray-900 mb-1">No orders yet</h2>
+                                <p className="text-gray-400 font-medium">When customers buy your items, they'll appear here.</p>
+                            </div>
+                        ) : (
+                            <div className="grid gap-6">
+                                {sellerOrders.map((order) => (
+                                    <div key={order.id} className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500">
+                                        <div className="p-8 lg:p-10">
+                                            <div className="flex flex-col lg:flex-row justify-between gap-8 mb-10">
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-xs font-black text-white bg-[#637D37] px-3 py-1 rounded-full uppercase tracking-widest">
+                                                            Order #{order.id.slice(-6).toUpperCase()}
+                                                        </span>
+                                                        <span className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border ${getStatusStyle(order.status)}`}>
+                                                            {order.status}
+                                                        </span>
+                                                    </div>
+                                                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                                                        {order.user.userName}
+                                                    </h2>
+                                                    <div className="flex items-center gap-2 text-gray-400 text-sm font-medium italic">
+                                                        <Clock className="w-4 h-4" />
+                                                        Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col sm:flex-row gap-3">
+                                                    <button
+                                                        onClick={() => generatePackingSlip(order)}
+                                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl font-black text-xs shadow-sm hover:bg-gray-50 active:scale-95 transition-all"
+                                                    >
+                                                        <FileDown className="w-4 h-4" />
+                                                        Packing Slip
+                                                    </button>
+                                                    {order.status === 'Paid' && (
+                                                        <button
+                                                            onClick={() => updateOrderStatus(order.id, 'Processing')}
+                                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all"
+                                                        >
+                                                            <Truck className="w-4 h-4" />
+                                                            Mark Processing
+                                                        </button>
+                                                    )}
+                                                    {order.status === 'Processing' && (
+                                                        <button
+                                                            onClick={() => updateOrderStatus(order.id, 'Shipped')}
+                                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/20 hover:scale-105 active:scale-95 transition-all"
+                                                        >
+                                                            <CheckCircle2 className="w-4 h-4" />
+                                                            Confirm Shipment
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                <div className="space-y-6">
+                                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Your Items in this Order</h3>
+                                                    <div className="space-y-4">
+                                                        {order.orderItems.map((item) => (
+                                                            <div key={item.id} className="flex gap-4 items-center bg-gray-50/50 p-4 rounded-3xl border border-gray-50">
+                                                                <div className="w-16 h-16 bg-white rounded-2xl border border-gray-100 p-1">
+                                                                    <img src={item.product.imageUrl} alt={item.product.name} className="w-full h-full object-cover rounded-xl" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="text-sm font-black text-gray-900">{item.product.name}</h4>
+                                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quantity: {item.quantity}</p>
+                                                                    <p className="text-sm font-black text-[#637D37]">₹{item.price * item.quantity}</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-6">
+                                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Shipping Destination</h3>
+                                                    <div className="p-6 bg-[#637D37]/5 rounded-[32px] border border-[#637D37]/10 space-y-4">
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm font-black text-gray-900">{order.user.userName}</p>
+                                                            <p className="text-xs font-medium text-gray-500 italic">{order.shippingAddress}</p>
+                                                            <p className="text-xs font-medium text-gray-500 italic">{order.city}, {order.state} - {order.zip}</p>
+                                                        </div>
+                                                        <div className="pt-4 border-t border-[#637D37]/10 flex items-center justify-between">
+                                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone</span>
+                                                            <span className="text-xs font-black text-gray-900">{order.phoneNumber}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
-                    {activeTab === "orders" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
-                </button>
+                )}
             </div>
 
-            {message && (activeTab === "inventory") && (
-                <div className={`p-4 rounded-xl mb-6 font-bold shadow-sm border ${message.includes("Error") ? "bg-red-50 text-red-700 border-red-100" : "bg-emerald-50 text-emerald-700 border-emerald-100"}`}>
-                    {message}
+            {/* Edit Modal */}
+            {showEditModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
+                            <button
+                                onClick={() => {
+                                    setShowEditModal(false)
+                                    setEditingProduct(null)
+                                }}
+                                className="p-2 hover:bg-gray-100 rounded-full"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleUpdate} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea
+                                    required
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={3}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        value={stock}
+                                        onChange={(e) => setStock(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Primary Image</label>
+                                    <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                        {imageUrl ? (
+                                            <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                                                <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setImageUrl("")}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 transition h-8 w-8 flex items-center justify-center"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={handleUpload}
+                                                className="flex flex-col items-center gap-3 text-gray-400 hover:text-[#637D37] transition py-8"
+                                            >
+                                                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
+                                                    <Upload className="w-6 h-6" />
+                                                </div>
+                                                <span className="text-sm font-bold">Main Image</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Gallery (Max 5)</label>
+                                    <div className="grid grid-cols-3 gap-2 p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 min-h-[160px]">
+                                        {galleryImages.map((url, idx) => (
+                                            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                                                <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setGalleryImages(prev => prev.filter((_, i) => i !== idx))}
+                                                    className="absolute top-1 right-1 bg-black/60 text-white p-1 rounded-full hover:bg-red-500 transition"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {galleryImages.length < 5 && (
+                                            <button
+                                                type="button"
+                                                onClick={handleGalleryUpload}
+                                                className="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-[#637D37] border-2 border-dashed border-gray-200 rounded-lg bg-white/50 hover:bg-white transition-all aspect-square"
+                                            >
+                                                <PlusCircle className="w-6 h-6" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider">Add</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="flex-1 bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold disabled:opacity-50"
+                                >
+                                    {loading ? <Loader2 className="animate-spin mx-auto" /> : "Update Product"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowEditModal(false)
+                                        setEditingProduct(null)
+                                    }}
+                                    className="px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
 
-            {activeTab === "inventory" ? (
-                <>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                        <PlusCircle className="w-8 h-8 text-[#637D37]" />
-                        Add New Product
-                    </h1>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                            />
+            {/* Delete Confirmation */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-md w-full p-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Product?</h2>
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleDelete}
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowDeleteConfirm(false)
+                                    setProductToDelete(null)
+                                }}
+                                className="flex-1 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea
-                                required
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                rows={3}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    value={price}
-                                    onChange={(e) => setPrice(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    value={stock}
-                                    onChange={(e) => setStock(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">SKU (Unique ID)</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={sku}
-                                    onChange={(e) => setSku(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category / Family</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={family}
-                                    onChange={(e) => setFamily(e.target.value)}
-                                    placeholder="e.g., Stationery"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                            <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-                                {imageUrl ? (
-                                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
-                                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                                        <button
-                                            type="button"
-                                            onClick={() => setImageUrl("")}
-                                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg hover:bg-red-600 transition"
-                                        >
-                                            <PlusCircle className="w-4 h-4 rotate-45" />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={handleUpload}
-                                        className="flex flex-col items-center gap-2 text-gray-500 hover:text-[#637D37] transition"
-                                    >
-                                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border">
-                                            <Upload className="w-6 h-6" />
-                                        </div>
-                                        <span className="text-sm font-medium">Click to upload from device</span>
-                                    </button>
-                                )}
-                                <p className="text-xs text-gray-400">Supports JPG, PNG up to 5MB</p>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold text-lg shadow-lg shadow-[#637D37]/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                        >
-                            {loading ? <Loader2 className="animate-spin" /> : "Create Product"}
-                        </button>
-                    </form>
+                    </div>
                 </div>
+            )}
         </div>
-
-    )
-}
-                    </div >
-                ) : (
-    /* Orders Management Tab */
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex items-center justify-between mb-8">
-            <div>
-                <h1 className="text-3xl font-black text-gray-900 tracking-tight">Order Fulfillment</h1>
-                <p className="text-gray-500 font-medium italic">Manage status transitions and customer shipping info.</p>
-            </div>
-            <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-xs font-black border border-amber-100 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                Action Required: {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
-            </div>
-        </div>
-
-        {ordersLoading ? (
-            <div className="flex justify-center py-20">
-                <div className="w-12 h-12 border-4 border-[#637D37]/20 border-t-[#637D37] rounded-full animate-spin"></div>
-            </div>
-        ) : sellerOrders.length === 0 ? (
-            <div className="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-gray-100">
-                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <ListChecks className="text-gray-300 w-8 h-8" />
-                </div>
-                <h2 className="text-xl font-black text-gray-900 mb-1">No orders yet</h2>
-                <p className="text-gray-400 font-medium">When customers buy your items, they'll appear here.</p>
-            </div>
-        ) : (
-            <div className="grid gap-6">
-                {sellerOrders.map((order) => (
-                    <div key={order.id} className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500">
-                        <div className="p-8 lg:p-10">
-                            <div className="flex flex-col lg:flex-row justify-between gap-8 mb-10">
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs font-black text-white bg-[#637D37] px-3 py-1 rounded-full uppercase tracking-widest">
-                                            Order #{order.id.slice(-6).toUpperCase()}
-                                        </span>
-                                        <span className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border ${getStatusStyle(order.status)}`}>
-                                            {order.status}
-                                        </span>
-                                    </div>
-                                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">
-                                        {order.user.userName}
-                                    </h2>
-                                    <div className="flex items-center gap-2 text-gray-400 text-sm font-medium italic">
-                                        <Clock className="w-4 h-4" />
-                                        Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    {order.status === 'Paid' && (
-                                        <button
-                                            onClick={() => updateOrderStatus(order.id, 'Processing')}
-                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all"
-                                        >
-                                            <Truck className="w-4 h-4" />
-                                            Mark Processing
-                                        </button>
-                                    )}
-                                    {order.status === 'Processing' && (
-                                        <button
-                                            onClick={() => updateOrderStatus(order.id, 'Shipped')}
-                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/20 hover:scale-105 active:scale-95 transition-all"
-                                        >
-                                            <CheckCircle2 className="w-4 h-4" />
-                                            Confirm Shipment
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                <div className="space-y-6">
-                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Your Items in this Order</h3>
-                                    <div className="space-y-4">
-                                        {order.orderItems.map((item) => (
-                                            <div key={item.id} className="flex gap-4 items-center bg-gray-50/50 p-4 rounded-3xl border border-gray-50">
-                                                <div className="w-16 h-16 bg-white rounded-2xl border border-gray-100 p-1">
-                                                    <img src={item.product.imageUrl} alt={item.product.name} className="w-full h-full object-cover rounded-xl" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-sm font-black text-gray-900">{item.product.name}</h4>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quantity: {item.quantity}</p>
-                                                    <p className="text-sm font-black text-[#637D37]">₹{item.price * item.quantity}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Shipping Destination</h3>
-                                    <div className="p-6 bg-[#637D37]/5 rounded-[32px] border border-[#637D37]/10 space-y-4">
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-black text-gray-900">{order.user.userName}</p>
-                                            <p className="text-xs font-medium text-gray-500 italic">{order.shippingAddress}</p>
-                                            <p className="text-xs font-medium text-gray-500 italic">{order.city}, {order.state} - {order.zip}</p>
-                                        </div>
-                                        <div className="pt-4 border-t border-[#637D37]/10 flex items-center justify-between">
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone</span>
-                                            <span className="text-xs font-black text-gray-900">{order.phoneNumber}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        )}
-    </div>
-)}
-            </div >
-
-    {/* Edit Modal */ }
-{
-    showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
-                    <button
-                        onClick={() => {
-                            setShowEditModal(false)
-                            setEditingProduct(null)
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
-                </div>
-
-                <form onSubmit={handleUpdate} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                        <input
-                            type="text"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea
-                            required
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            rows={3}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
-                            <input
-                                type="number"
-                                required
-                                min="0"
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
-                            <input
-                                type="number"
-                                required
-                                min="0"
-                                value={stock}
-                                onChange={(e) => setStock(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold disabled:opacity-50"
-                        >
-                            {loading ? <Loader2 className="animate-spin mx-auto" /> : "Update Product"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setShowEditModal(false)
-                                setEditingProduct(null)
-                            }}
-                            className="px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    )
-}
-
-{/* Delete Confirmation */ }
-{
-    showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Product?</h2>
-                <p className="text-gray-600 mb-6">
-                    Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
-                </p>
-                <div className="flex gap-3">
-                    <button
-                        onClick={handleDelete}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold"
-                    >
-                        Delete
-                    </button>
-                    <button
-                        onClick={() => {
-                            setShowDeleteConfirm(false)
-                            setProductToDelete(null)
-                        }}
-                        className="flex-1 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
-        </div >
     )
 }

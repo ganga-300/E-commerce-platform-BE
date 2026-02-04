@@ -163,10 +163,14 @@ async function getAllUsers(page = 1, limit = 20) {
                 userName: true,
                 email: true,
                 role: true,
+                phoneNumber: true,
+                isApproved: true,
+                profilePicture: true,
                 createdAt: true,
                 _count: {
                     select: {
-                        orders: true
+                        orders: true,
+                        products: true
                     }
                 }
             }
@@ -180,6 +184,23 @@ async function getAllUsers(page = 1, limit = 20) {
         page,
         totalPages: Math.ceil(total / limit)
     };
+}
+
+// Get single user by ID with full info
+async function getUserByIdAdmin(userId) {
+    return await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+            addresses: true,
+            _count: {
+                select: {
+                    orders: true,
+                    products: true,
+                    reviews: true
+                }
+            }
+        }
+    });
 }
 
 // Get all orders with pagination
@@ -275,6 +296,46 @@ async function getPendingSellers() {
 }
 
 // Approve or reject a seller
+// Global search for Admin Command Palette
+async function globalSearchInDB(searchTerm) {
+    const [users, products, orders] = await Promise.all([
+        prisma.user.findMany({
+            where: {
+                OR: [
+                    { userName: { contains: searchTerm, mode: 'insensitive' } },
+                    { email: { contains: searchTerm, mode: 'insensitive' } }
+                ]
+            },
+            take: 5,
+            select: { id: true, userName: true, email: true, role: true }
+        }),
+        prisma.product.findMany({
+            where: {
+                OR: [
+                    { name: { contains: searchTerm, mode: 'insensitive' } },
+                    { sku: { contains: searchTerm, mode: 'insensitive' } }
+                ]
+            },
+            take: 5,
+            select: { id: true, name: true, sku: true, imageUrl: true }
+        }),
+        prisma.order.findMany({
+            where: {
+                OR: [
+                    { id: { contains: searchTerm, mode: 'insensitive' } },
+                    { razorpayOrderId: { contains: searchTerm, mode: 'insensitive' } }
+                ]
+            },
+            take: 5,
+            include: {
+                user: { select: { userName: true } }
+            }
+        })
+    ]);
+
+    return { users, products, orders };
+}
+
 async function updateSellerStatus(userId, isApproved) {
     return await prisma.user.update({
         where: { id: userId },
@@ -288,6 +349,7 @@ module.exports = {
     getRecentOrders,
     getTopProducts,
     getAllUsers,
+    getUserByIdAdmin,
     getAllOrders,
     getAllProductsForAdmin,
     deleteProductAdmin,

@@ -8,7 +8,9 @@ const {
     getAllProductsForAdmin,
     deleteProductAdmin,
     getPendingSellers,
-    updateSellerStatus
+    updateSellerStatus,
+    globalSearchInDB,
+    getUserByIdAdmin
 } = require("./service");
 
 // Get dashboard stats
@@ -109,6 +111,32 @@ async function approveSeller(req, res) {
     }
 }
 
+// Global search
+async function globalSearch(req, res) {
+    try {
+        const { query } = req.query;
+        if (!query) return res.json({ users: [], products: [], orders: [] });
+        const results = await globalSearchInDB(query);
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error performing search" });
+    }
+}
+
+// Get user details
+async function getUserDetails(req, res) {
+    try {
+        const { id } = req.params;
+        const user = await getUserByIdAdmin(id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error fetching user details" });
+    }
+}
+
 module.exports = {
     getDashboardStats,
     getUsers,
@@ -116,5 +144,7 @@ module.exports = {
     getProducts,
     deleteProduct,
     getPendingSellersByAdmin,
-    approveSeller
+    approveSeller,
+    globalSearch,
+    getUserDetails
 };

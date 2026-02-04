@@ -14,12 +14,29 @@ import {
     ArrowLeft,
     ShieldCheck,
     Calendar,
-    ArrowRight,
+    ArrowUpRight,
     MapPin,
     ExternalLink,
-    Search
+    Search,
+    ChevronRight,
+    Activity,
+    AlertCircle
 } from "lucide-react"
 import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.05, delayChildren: 0.1 }
+    }
+}
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
+}
 
 export default function AdminApprovalsPage() {
     const { user, token, loading: authLoading } = useAuth()
@@ -31,8 +48,9 @@ export default function AdminApprovalsPage() {
 
     useEffect(() => {
         if (!authLoading) {
-            if (!user || user.role !== "ADMIN") {
-                router.push("/")
+            const userRole = user?.role?.toUpperCase();
+            if (!user || userRole !== 'ADMIN') {
+                router.push('/')
                 return
             }
             fetchPendingSellers()
@@ -84,127 +102,143 @@ export default function AdminApprovalsPage() {
         }
     }
 
-    if (authLoading || !user || user.role !== "ADMIN") {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+    if (authLoading || loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-transparent p-20">
+            <div className="flex flex-col items-center gap-6">
                 <div className="relative">
-                    <div className="w-16 h-16 border-4 border-[#637D37]/20 border-t-[#637D37] rounded-full animate-spin"></div>
+                    <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="w-16 h-16 border-[3px] border-[#637D37]/10 border-t-[#637D37] rounded-full"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Users className="w-6 h-6 text-[#637D37] animate-pulse" />
+                    </div>
                 </div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">Scanning Authorization Queue</p>
             </div>
-        )
-    }
+        </div>
+    )
 
     return (
-        <div className="min-h-screen bg-gray-50/50 text-gray-900 font-sans">
-            {/* Soft Ambient Background Elements */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#637D37]/5 blur-[120px] rounded-full"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full"></div>
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="min-h-screen bg-transparent p-6 lg:p-10 space-y-10"
+        >
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none opacity-40">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#637D37]/5 blur-[120px] rounded-full" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full" />
             </div>
 
-            <div className="relative max-w-7xl mx-auto px-6 py-12 lg:py-20">
-                {/* Header */}
-                <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8 animate-in fade-in slide-in-from-top-8 duration-700">
-                    <div className="space-y-4">
-                        <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-100 rounded-full text-sm font-bold text-gray-400 hover:text-[#637D37] transition-all group shadow-sm">
-                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
-                        </Link>
-                        <div className="space-y-1">
-                            <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-gray-900">
-                                Seller Approvals
-                            </h1>
-                            <p className="text-xl text-gray-400 font-medium max-w-xl">
-                                Verify and authorize pending vendor applications for your premium marketplace.
-                            </p>
+            {/* Header / Top Bar */}
+            <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between gap-8 relative z-10">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[#637D37] font-black text-[10px] uppercase tracking-[0.4em]">
+                        <span className="w-4 h-px bg-[#637D37]"></span> VENDOR ONBOARDING
+                    </div>
+                    <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter">
+                        Seller <span className="text-[#637D37]">Approvals</span>
+                    </h1>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    <div className="p-6 bg-white/70 backdrop-blur-xl border border-gray-100 rounded-[32px] shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 bg-[#637D37]/10 rounded-2xl flex items-center justify-center border border-[#637D37]/10">
+                            <Users className="text-[#637D37] w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-[#637D37] uppercase tracking-[0.2em]">Pending Queue</p>
+                            <p className="text-3xl font-black tabular-nums text-gray-900">{pendingSellers.length}</p>
                         </div>
                     </div>
+                </div>
+            </motion.div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="p-6 bg-white border border-gray-100 rounded-[32px] shadow-sm flex items-center gap-4">
-                            <div className="w-12 h-12 bg-[#637D37]/10 rounded-2xl flex items-center justify-center border border-[#637D37]/10">
-                                <Users className="text-[#637D37] w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-[#637D37] uppercase tracking-[0.2em]">Queue Status</p>
-                                <p className="text-3xl font-black tabular-nums text-gray-900">{pendingSellers.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Status Message */}
+            {/* Status Message */}
+            <AnimatePresence>
                 {message && (
-                    <div className={`mb-12 p-6 rounded-[32px] border flex items-center gap-4 animate-in zoom-in duration-300 shadow-sm ${message.includes("Error") ? "bg-red-50 border-red-100 text-red-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"}`}>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className={`p-6 rounded-[32px] border flex items-center gap-4 relative z-20 ${message.includes("Error") ? "bg-red-50 border-red-100 text-red-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"}`}
+                    >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${message.includes("Error") ? "bg-red-500/10" : "bg-emerald-500/10"}`}>
-                            {message.includes("Error") ? <XCircle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+                            {message.includes("Error") ? <AlertCircle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
                         </div>
-                        <p className="font-bold text-lg">{message}</p>
-                    </div>
+                        <p className="font-black text-sm uppercase tracking-widest">{message}</p>
+                    </motion.div>
                 )}
+            </AnimatePresence>
 
-                {/* Main Content */}
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-40 space-y-4">
-                        <div className="w-12 h-12 border-4 border-[#637D37]/20 border-t-[#637D37] rounded-full animate-spin"></div>
-                        <p className="text-gray-400 font-bold animate-pulse">Fetching Verified Records...</p>
+            {/* Main Content Grid */}
+            {pendingSellers.length === 0 ? (
+                <motion.div
+                    variants={itemVariants}
+                    className="bg-white/70 backdrop-blur-2xl border border-gray-100 rounded-[48px] p-24 text-center shadow-sm relative z-10"
+                >
+                    <div className="bg-emerald-50/50 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8 border border-emerald-100 shadow-inner">
+                        <CheckCircle className="text-emerald-500 w-12 h-12" />
                     </div>
-                ) : pendingSellers.length === 0 ? (
-                    <div className="bg-white border border-gray-100 rounded-[40px] p-20 text-center shadow-sm animate-in zoom-in duration-1000">
-                        <div className="bg-emerald-50 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-emerald-100">
-                            <CheckCircle className="text-emerald-500 w-12 h-12" />
-                        </div>
-                        <h2 className="text-4xl font-black text-gray-900 mb-4">You're All Caught Up</h2>
-                        <p className="text-gray-400 text-lg max-w-md mx-auto font-medium">There are currently no seller applications requiring your attention. The queue is empty.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {pendingSellers.map((seller, idx) => (
-                            <div
+                    <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tighter">Queue Synchronized</h2>
+                    <p className="text-gray-400 text-lg max-w-md mx-auto font-medium leading-relaxed italic">There are currently no active seller applications requiring authorization.</p>
+                </motion.div>
+            ) : (
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 relative z-10">
+                    <AnimatePresence mode="popLayout">
+                        {pendingSellers.map((seller) => (
+                            <motion.div
                                 key={seller.id}
-                                style={{ animationDelay: `${idx * 150}ms` }}
-                                className="group bg-white border border-gray-100 hover:border-[#637D37]/30 rounded-[32px] overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-[#637D37]/5 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                                layout
+                                variants={itemVariants}
+                                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3 } }}
+                                className="group bg-white/70 backdrop-blur-2xl border border-gray-100 hover:border-[#637D37]/30 rounded-[40px] overflow-hidden transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#637D37]/5"
                             >
-                                <div className="p-8 lg:p-10">
-                                    <div className="flex items-start justify-between mb-8">
-                                        <div className="flex items-center gap-5">
-                                            <div className="relative w-20 h-20 bg-gray-50 border border-gray-100 rounded-[24px] overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                                                {seller.profilePicture ? (
-                                                    <img src={seller.profilePicture} alt="" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full bg-[#637D37]/5 flex items-center justify-center">
-                                                        <Users className="text-[#637D37] w-8 h-8 opacity-40" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-black text-gray-900 mb-1 group-hover:text-[#637D37] transition-colors">{seller.userName}</h3>
-                                                <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-amber-100 w-fit shadow-sm">
-                                                    <Clock className="w-3 h-3" /> Application Pending
+                                <div className="p-10">
+                                    <div className="flex items-start justify-between mb-10">
+                                        <div className="flex items-center gap-6">
+                                            <div className="relative">
+                                                <div className="w-24 h-24 bg-white border border-gray-100 rounded-[32px] overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-700 shadow-sm p-1">
+                                                    {seller.profilePicture ? (
+                                                        <img src={seller.profilePicture} alt="" className="w-full h-full object-cover rounded-[28px]" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-[#637D37]/5 flex items-center justify-center rounded-[28px]">
+                                                            <Users className="text-[#637D37] w-10 h-10 opacity-40" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 border-4 border-white rounded-2xl flex items-center justify-center shadow-lg">
+                                                    <Clock className="w-5 h-5 text-white" />
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <div className="text-right hidden sm:block">
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Signed Up</p>
-                                            <div className="flex items-center justify-end gap-1.5 text-gray-500 font-bold text-sm">
-                                                <Calendar className="w-4 h-4" />
-                                                {new Date(seller.createdAt).toLocaleDateString()}
+                                            <div className="space-y-1">
+                                                <h3 className="text-3xl font-black text-gray-900 tracking-tighter group-hover:text-[#637D37] transition-colors lowercase first-letter:uppercase">{seller.userName}</h3>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full border border-gray-100">Pending Authorization</span>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-bold italic">
+                                                        <Calendar className="w-3.5 h-3.5" />
+                                                        {new Date(seller.createdAt).toLocaleDateString()}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                                        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-1 group/item hover:bg-white transition-all shadow-sm">
-                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                <Mail className="w-3 h-3" /> Email Address
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                                        <div className="p-6 bg-white/50 border border-gray-50 rounded-[28px] space-y-2 group/item hover:bg-white transition-all shadow-sm">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                <Mail className="w-3.5 h-3.5" /> Identity Nexus
                                             </p>
-                                            <p className="text-sm font-bold text-gray-700 truncate">{seller.email}</p>
+                                            <p className="text-sm font-black text-gray-900 truncate">{seller.email}</p>
                                         </div>
-                                        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl space-y-1 group/item hover:bg-white transition-all shadow-sm">
-                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                <Phone className="w-3 h-3" /> Contact Number
+                                        <div className="p-6 bg-white/50 border border-gray-50 rounded-[28px] space-y-2 group/item hover:bg-white transition-all shadow-sm">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                <Phone className="w-3.5 h-3.5" /> Comms Record
                                             </p>
-                                            <p className="text-sm font-bold text-gray-700">{seller.phoneNumber || "Not provided"}</p>
+                                            <p className="text-sm font-black text-gray-900">{seller.phoneNumber || "PENDING_INPUT"}</p>
                                         </div>
                                     </div>
 
@@ -212,46 +246,48 @@ export default function AdminApprovalsPage() {
                                         <button
                                             onClick={() => handleApproval(seller.id, true)}
                                             disabled={actionLoading === seller.id}
-                                            className="flex-[2] py-4 bg-[#637D37] hover:bg-[#52682d] text-white rounded-2xl font-black text-sm shadow-lg shadow-[#637D37]/20 hover:shadow-[#637D37]/40 hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                                            className="flex-[2] py-5 bg-[#637D37] text-white rounded-[28px] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#637D37]/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                                         >
                                             {actionLoading === seller.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
-                                            Authorize Seller
+                                            Validate Vendor
                                         </button>
                                         <button
                                             onClick={() => handleApproval(seller.id, false)}
                                             disabled={actionLoading === seller.id}
-                                            className="flex-1 py-4 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-500 border border-gray-100 hover:border-red-100 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
+                                            className="flex-1 py-5 bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 rounded-[28px] font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-sm"
                                         >
-                                            {actionLoading === seller.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                                            {actionLoading === seller.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <XCircle className="w-5 h-5" />}
                                             Decline
                                         </button>
                                     </div>
                                 </div>
-
-                                {/* Bottom Accent */}
-                                <div className="h-1.5 w-full bg-[#637D37] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            </div>
+                                <div className="h-2 w-full bg-gradient-to-r from-[#637D37] to-[#8eb151] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+                            </motion.div>
                         ))}
-                    </div>
-                )}
-            </div>
+                    </AnimatePresence>
+                </div>
+            )}
 
-            <style jsx global>{`
-                @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes slide-in-from-top { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                @keyframes slide-in-from-bottom { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                @keyframes zoom-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-                
-                .animate-in {
-                    animation: var(--animation-name) duration ease-out;
-                }
-                .fade-in { --animation-name: fade-in; }
-                .slide-in-from-top-8 { --animation-name: slide-in-from-top; }
-                .slide-in-from-bottom-8 { --animation-name: slide-in-from-bottom; }
-                .zoom-in { --animation-name: zoom-in; }
-                
-                .fill-mode-both { animation-fill-mode: both; }
-            `}</style>
-        </div>
+            {/* Footer Status */}
+            <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-center justify-between gap-6 p-10 bg-white/40 backdrop-blur-xl border border-white/20 rounded-[40px] relative z-10">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white rounded-3xl flex items-center justify-center shadow-sm text-emerald-500">
+                        <Activity className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Protocol Integrity</p>
+                        <p className="text-sm font-bold text-gray-900">All applications subject to multi-layered verification.</p>
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => router.push('/admin')}
+                    className="w-full md:w-auto px-10 py-5 bg-gray-900 text-white rounded-[28px] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-gray-900/10 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+                >
+                    Return to Intelligence Hub
+                    <ChevronRight className="w-5 h-5" />
+                </button>
+            </motion.div>
+        </motion.div>
     )
 }
