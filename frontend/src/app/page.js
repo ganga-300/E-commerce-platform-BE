@@ -17,7 +17,20 @@ export default function Page() {
   const router = useRouter()
 
 
+
   if (loading) return null; // Prevent flash of home content
+
+  // Strict Redirect for Admin/Seller
+  const role = user?.role?.toUpperCase()
+  if (role === 'ADMIN' || role === 'SUPERADMIN') {
+    router.replace('/admin')
+    return null
+  }
+  if (role === 'SELLER') {
+    router.replace('/seller')
+    return null
+  }
+
   return (
     <PageTransition className="flex flex-col items-center justify-center w-full">
 

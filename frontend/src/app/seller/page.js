@@ -394,10 +394,11 @@ export default function SellerDashboard() {
                                 Check Status Again
                             </button>
                             <button
-                                onClick={() => router.push("/")}
-                                className="flex-1 py-4 bg-white text-gray-600 border border-gray-200 rounded-2xl font-bold hover:bg-gray-50 transition-all"
+                                onClick={() => logout()}
+                                className="flex-1 py-4 bg-white text-red-500 border border-red-100 rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
                             >
-                                Back to Home
+                                <LogOut className="w-4 h-4" />
+                                Sign Out
                             </button>
                         </div>
                     </div>
