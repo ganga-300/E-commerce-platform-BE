@@ -49,7 +49,7 @@ export default function ProductDetailsClient({ product }) {
                         {/* Image Section */}
                         <div className="relative aspect-square lg:aspect-auto h-96 lg:h-full bg-gray-100 rounded-xl overflow-hidden">
                             <Image
-                                src={product.imageUrl || "https://premium-stationery.com/placeholder.jpg"}
+                                src={product.imageUrl || "/placeholder.jpg"}
                                 alt={product.name}
                                 fill
                                 className="object-cover hover:scale-105 transition-transform duration-500"
