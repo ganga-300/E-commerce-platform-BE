@@ -48,7 +48,7 @@ const products = [
         stock: 200,
         sku: "GLUE-PERF-200G",
         family: "Craft",
-        imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2000&auto=format&fit=crop"
+        imageUrl: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2000&auto=format&fit=crop"
     }
 ];
 
