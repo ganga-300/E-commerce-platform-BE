@@ -19,7 +19,17 @@ export default function RelatedProducts({ currentProductId, category }) {
 
                 const res = await fetch(url)
                 if (res.ok) {
-                    const data = await res.json()
+                    let data = await res.json()
+
+                    // If no products found by category, fallback to latest products
+                    if (data.length <= 1 && category) {
+                        const fallbackUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/products`
+                        const fallbackRes = await fetch(fallbackUrl)
+                        if (fallbackRes.ok) {
+                            data = await fallbackRes.json()
+                        }
+                    }
+
                     // Filter out current product and limit to 4
                     const related = data
                         .filter(p => p.id !== currentProductId)

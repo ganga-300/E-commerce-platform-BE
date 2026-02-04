@@ -19,8 +19,9 @@ async function getProductsFromDB(filters = {}) {
   }
 
   // Category filter
+  // Category filter (using 'family' field as distinct from relational category)
   if (category) {
-    where.categoryId = category;
+    where.family = category;
   }
 
   // Price range filter
