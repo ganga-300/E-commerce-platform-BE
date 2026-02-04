@@ -1,5 +1,8 @@
+"use client"
+
+import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
-import { GraduationCap, Award, Users } from "lucide-react"
+import { GraduationCap, Award, Users, Truck } from "lucide-react"
 
 export default function WhyChooseUs() {
   const features = [
@@ -23,43 +26,74 @@ export default function WhyChooseUs() {
       description: "Join a thriving community of ambitious students who trust StudyStuff for their academic journey.",
       number: "03",
     },
+    {
+      icon: Truck,
+      title: "Fast Delivery",
+      description: "Quick and reliable shipping across India. Track your order every step of the way.",
+      number: "04",
+    },
   ]
 
   return (
-    <section className="py-32 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.03]">
+    <section className="py-24 bg-gray-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[length:32px_32px]" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center mb-24">
-          <span className="text-sm font-medium uppercase text-muted-foreground mb-4 block tracking-[0.2em]">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-20"
+        >
+          <span className="text-sm font-medium uppercase text-gray-500 mb-4 block tracking-widest">
             Excellence Redefined
           </span>
-          <h2 className="text-6xl font-light text-foreground tracking-tight">
-            Why Choose <span className="font-serif italic text-primary">StudyStuff</span>
+          <h2 className="text-4xl font-light text-gray-900 tracking-tight">
+            Why Choose <span className="font-normal text-gray-900">StudyStuff</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
             Transform your academic journey with thoughtfully designed accessories that inspire excellence.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {features.map((feature) => (
-            <Card key={feature.title} className="group relative bg-card/60 backdrop-blur-sm border hover:shadow-xl">
-              <CardContent className="p-12">
-                <div className="absolute top-8 right-8 text-6xl font-light text-muted-foreground/20">
-                  {feature.number}
-                </div>
-                <div className="mb-8">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="w-8 h-8 text-primary" />
+        {/* Feature Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Card className="group relative bg-white hover:shadow-xl transition-all duration-500 border-gray-100 h-full">
+                <CardContent className="p-8">
+                  {/* Number */}
+                  <div className="absolute top-6 right-6 text-5xl font-light text-gray-100 group-hover:text-gray-200 transition-colors">
+                    {feature.number}
                   </div>
-                </div>
-                <h3 className="text-2xl font-light mb-4">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </CardContent>
-            </Card>
+
+                  {/* Icon */}
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="mb-6"
+                  >
+                    <div className="w-14 h-14 rounded-full bg-gray-100 group-hover:bg-gray-900 flex items-center justify-center transition-all duration-300">
+                      <feature.icon className="w-7 h-7 text-gray-900 group-hover:text-white transition-colors duration-300" />
+                    </div>
+                  </motion.div>
+
+                  {/* Content */}
+                  <h3 className="text-xl font-medium mb-3 text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">{feature.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
