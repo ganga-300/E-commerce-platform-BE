@@ -62,29 +62,31 @@ export default function ProductDetailsClient({ product }) {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
                     {/* Image Section */}
-                    <div className="space-y-6">
+                    <div className="lg:col-span-2">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="relative aspect-square bg-gray-50 rounded-lg overflow-hidden group"
+                            className="relative w-full max-w-md mx-auto aspect-square bg-gray-50 rounded-lg overflow-hidden group"
                         >
-                            <Image
-                                src={product.imageUrl || "/placeholder.jpg"}
-                                alt={product.name}
-                                fill
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                priority
-                            />
+                            <div className="absolute inset-0 p-8">
+                                <Image
+                                    src={product.imageUrl || "/placeholder.jpg"}
+                                    alt={product.name}
+                                    fill
+                                    className="object-contain transition-transform duration-700 group-hover:scale-105"
+                                    priority
+                                />
+                            </div>
                             <button
                                 onClick={() => toggleWishlist(product)}
-                                className={`absolute top-6 right-6 w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${isFavorited
+                                className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${isFavorited
                                         ? 'bg-white text-red-500'
                                         : 'bg-white/40 text-gray-700 hover:bg-white/60'
                                     }`}
                             >
-                                <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
+                                <Heart className={`w-4.5 h-4.5 ${isFavorited ? 'fill-current' : ''}`} />
                             </button>
                         </motion.div>
                     </div>
@@ -94,7 +96,7 @@ export default function ProductDetailsClient({ product }) {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="space-y-8"
+                        className="lg:col-span-3 space-y-8"
                     >
                         {/* Category & Rating */}
                         <div className="flex items-center gap-4">
