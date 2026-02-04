@@ -4,7 +4,6 @@ import { useWishlist } from "@/contexts/WishlistContext"
 import { Plus, Minus, Heart } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
 
 export default function ProductCard({ product }) {
   const { addItem, removeItem, quantity } = useCart()
@@ -14,75 +13,73 @@ export default function ProductCard({ product }) {
   const isFavorited = isInWishlist(product.id)
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ y: -8 }}
-      className="group relative bg-card rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden w-full max-w-[260px] border border-border/50"
-    >
-      <Link href={`/product/${product.id}`} className="relative block w-full h-56 overflow-hidden cursor-pointer">
+    <div className="group relative bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <Link href={`/product/${product.id}`} className="relative block w-full aspect-square overflow-hidden cursor-pointer">
         <Image
           src={product.imageUrl || product.image || "/placeholder.jpg"}
           alt={product.name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors duration-300"></div>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white shadow-sm transition-colors z-10"
+        <button
+          className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleWishlist(product);
           }}
         >
-          <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
-        </motion.button>
+          <Heart className={`w-5 h-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+        </button>
       </Link>
 
-      <div className="p-5">
-        <div className="mb-1">
-          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{product.family || 'Stationery'}</span>
+      <div className="p-4">
+        <div className="mb-2">
+          <span className="text-xs text-gray-500 uppercase tracking-wider">{product.family || 'Stationery'}</span>
         </div>
-        <Link href={`/product/${product.id}`}>
-          <h3 className="text-base font-bold text-foreground cursor-pointer hover:text-primary transition-colors leading-tight line-clamp-1">{product.name}</h3>
-        </Link>
-        <p className="text-lg font-black text-foreground mt-2">₹{product.price}</p>
 
-        <div className="mt-4">
-          {count === 0 ? (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => addItem(product)}
-              className="w-full py-2.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md shadow-primary/10"
-            >
-              Add to Cart
-            </motion.button>
+        <Link href={`/product/${product.id}`}>
+          <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xl font-semibold text-gray-900">₹{product.price}</span>
+          {product.stock > 0 ? (
+            <span className="text-xs text-green-600">In Stock</span>
           ) : (
-            <div className="flex items-center justify-between bg-muted rounded-xl p-1 border border-border">
-              <button
-                onClick={() => removeItem(product.name)}
-                className="p-2 text-muted-foreground hover:text-destructive hover:bg-background rounded-lg transition-all"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="text-sm font-bold text-foreground">{count}</span>
-              <button
-                onClick={() => addItem(product)}
-                className="p-2 text-muted-foreground hover:text-primary hover:bg-background rounded-lg transition-all"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
+            <span className="text-xs text-red-600">Out of Stock</span>
           )}
         </div>
+
+        {count === 0 ? (
+          <button
+            onClick={() => addItem(product)}
+            disabled={product.stock === 0}
+            className="w-full bg-gray-900 text-white py-2.5 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add to Cart
+          </button>
+        ) : (
+          <div className="flex items-center justify-between bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => removeItem(product.name)}
+              className="w-8 h-8 flex items-center justify-center bg-white rounded-md text-gray-700"
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+            <span className="font-semibold text-gray-900">{count}</span>
+            <button
+              onClick={() => addItem(product)}
+              className="w-8 h-8 flex items-center justify-center bg-gray-900 text-white rounded-md"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   )
 }
