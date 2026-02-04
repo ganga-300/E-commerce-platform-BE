@@ -74,4 +74,83 @@ async function getAnalyticsFromDB(sellerId) {
     };
 }
 
-module.exports = { getAnalyticsFromDB };
+async function getSellerOrdersFromDB(sellerId) {
+    // Fetch orders that contain products belonging to this seller
+    const orders = await prisma.order.findMany({
+        where: {
+            orderItems: {
+                some: {
+                    product: {
+                        sellerId: sellerId
+                    }
+                }
+            }
+        },
+        include: {
+            user: {
+                select: {
+                    userName: true,
+                    email: true
+                }
+            },
+            orderItems: {
+                where: {
+                    product: {
+                        sellerId: sellerId
+                    }
+                },
+                include: {
+                    product: {
+                        select: {
+                            id: true,
+                            name: true,
+                            price: true,
+                            imageUrl: true,
+                            sku: true
+                        }
+                    }
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    return orders;
+}
+
+async function updateOrderStatusBySeller(orderId, sellerId, status, notes) {
+    // Validate that the order contains products from this seller
+    const orderItems = await prisma.orderItem.findFirst({
+        where: {
+            orderId: orderId,
+            product: {
+                sellerId: sellerId
+            }
+        }
+    });
+
+    if (!orderItems) {
+        throw new Error("unauthorized: This order does not contain your products");
+    }
+
+    // Update the global order status (Simplified for student project)
+    const updatedOrder = await prisma.order.update({
+        where: { id: orderId },
+        data: { status }
+    });
+
+    // Create status history
+    await prisma.orderStatusHistory.create({
+        data: {
+            orderId,
+            status,
+            notes: notes || `Status updated to ${status} by seller`
+        }
+    });
+
+    return updatedOrder;
+}
+
+module.exports = { getAnalyticsFromDB, getSellerOrdersFromDB, updateOrderStatusBySeller };

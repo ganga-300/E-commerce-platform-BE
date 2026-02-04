@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../../contexts/AuthContext"
-import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut } from "lucide-react"
+import { PlusCircle, Loader2, Upload, Edit2, Trash2, X, Clock, ShieldCheck, Mail, TrendingUp, DollarSign, Package, LogOut, ShoppingCart, ListChecks, CheckCircle2, Truck, AlertCircle } from "lucide-react"
 import Script from "next/script"
 
 export default function SellerDashboard() {
@@ -19,6 +19,9 @@ export default function SellerDashboard() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [productToDelete, setProductToDelete] = useState(null)
     const [analytics, setAnalytics] = useState(null)
+    const [activeTab, setActiveTab] = useState("inventory") // inventory or orders
+    const [sellerOrders, setSellerOrders] = useState([])
+    const [ordersLoading, setOrdersLoading] = useState(false)
 
     const fetchAnalytics = async () => {
         try {
@@ -50,6 +53,45 @@ export default function SellerDashboard() {
         }
     }
 
+    const fetchSellerOrders = async () => {
+        setOrdersLoading(true)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/seller/orders`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setSellerOrders(data)
+            }
+        } catch (err) {
+            console.error("Error fetching orders:", err)
+        } finally {
+            setOrdersLoading(false)
+        }
+    }
+
+    const updateOrderStatus = async (orderId, status) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/seller/orders/${orderId}/status`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            })
+            if (res.ok) {
+                setMessage(`Order marked as ${status}`)
+                fetchSellerOrders() // Refresh list
+            } else {
+                const errorData = await res.json()
+                setMessage(`Error: ${errorData.message}`)
+            }
+        } catch (err) {
+            setMessage(`Error: ${err.message}`)
+        }
+    }
+
     const checkApprovalStatus = async () => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/users/profile`, {
@@ -72,6 +114,7 @@ export default function SellerDashboard() {
     useEffect(() => {
         if (token) {
             checkApprovalStatus()
+            fetchSellerOrders()
         }
     }, [token])
 
@@ -330,10 +373,29 @@ export default function SellerDashboard() {
         )
     }
 
+    const getStatusStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'delivered':
+            case 'shipped':
+            case 'completed':
+                return 'bg-emerald-50 text-emerald-600 border-emerald-100'
+            case 'paid':
+            case 'processing':
+                return 'bg-blue-50 text-blue-600 border-blue-100'
+            case 'pending':
+                return 'bg-amber-50 text-amber-600 border-amber-100'
+            case 'cancelled':
+                return 'bg-red-50 text-red-600 border-red-100'
+            default:
+                return 'bg-gray-50 text-gray-400 border-gray-100'
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="afterInteractive" />
             <div className="max-w-6xl mx-auto">
+                {/* Analytics Section stays at top */}
                 {/* Analytics Section */}
                 {analytics && (
                     <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -428,17 +490,50 @@ export default function SellerDashboard() {
                     </div>
                 )}
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                    <PlusCircle className="w-8 h-8 text-[#637D37]" />
-                    Add New Product
-                </h1>
+            </div>
+                )}
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                    {message && (
-                        <div className={`p-4 rounded-lg mb-6 ${message.includes("Error") ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
-                            {message}
-                        </div>
-                    )}
+            {/* Navigation Tabs */}
+            <div className="flex gap-4 mb-12 border-b border-gray-200">
+                <button
+                    onClick={() => setActiveTab("inventory")}
+                    className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "inventory" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
+                >
+                    <div className="flex items-center gap-2">
+                        <Package className="w-4 h-4" />
+                        Inventory
+                    </div>
+                    {activeTab === "inventory" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
+                </button>
+                <button
+                    onClick={() => setActiveTab("orders")}
+                    className={`pb-4 px-2 font-black text-sm uppercase tracking-widest transition-all relative ${activeTab === "orders" ? "text-[#637D37]" : "text-gray-400 hover:text-gray-600"}`}
+                >
+                    <div className="flex items-center gap-2">
+                        <ShoppingCart className="w-4 h-4" />
+                        Manage Orders
+                        {sellerOrders.length > 0 && (
+                            <span className="bg-[#637D37] text-white text-[10px] px-2 py-0.5 rounded-full ring-2 ring-white">
+                                {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
+                            </span>
+                        )}
+                    </div>
+                    {activeTab === "orders" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#637D37] rounded-full"></div>}
+                </button>
+            </div>
+
+            {message && (activeTab === "inventory") && (
+                <div className={`p-4 rounded-xl mb-6 font-bold shadow-sm border ${message.includes("Error") ? "bg-red-50 text-red-700 border-red-100" : "bg-emerald-50 text-emerald-700 border-emerald-100"}`}>
+                    {message}
+                </div>
+            )}
+
+            {activeTab === "inventory" ? (
+                <>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                        <PlusCircle className="w-8 h-8 text-[#637D37]" />
+                        Add New Product
+                    </h1>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
@@ -553,183 +648,248 @@ export default function SellerDashboard() {
                         </button>
                     </form>
                 </div>
-            </div>
-
-            {/* My Listings */}
-            <div className="mt-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">My Listings</h2>
-                {fetching ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="animate-spin text-[#637D37]" />
-                    </div>
-                ) : products.length === 0 ? (
-                    <div className="bg-white rounded-xl p-8 text-center border border-dashed border-gray-300 text-gray-500">
-                        No products listed yet. Add your first product above!
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b border-gray-100">
-                                <tr>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">Product</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">SKU</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">Price</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">Stock</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {products.map((p) => (
-                                    <tr key={p.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm text-gray-800">{p.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{p.sku}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-[#637D37]">₹{p.price}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{p.stock}</td>
-                                        <td className="px-6 py-4 text-sm">
-                                            <button
-                                                onClick={() => handleEdit(p)}
-                                                className="text-blue-600 hover:text-blue-800 mr-3 inline-flex items-center gap-1"
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setProductToDelete(p)
-                                                    setShowDeleteConfirm(true)
-                                                }}
-                                                className="text-red-600 hover:text-red-800 inline-flex items-center gap-1"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-
-            {/* Edit Modal */}
-            {showEditModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
-                            <button
-                                onClick={() => {
-                                    setShowEditModal(false)
-                                    setEditingProduct(null)
-                                }}
-                                className="p-2 hover:bg-gray-100 rounded-full"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleUpdate} className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea
-                                    required
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    rows={3}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min="0"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min="0"
-                                        value={stock}
-                                        onChange={(e) => setStock(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex gap-3">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="flex-1 bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold disabled:opacity-50"
-                                >
-                                    {loading ? <Loader2 className="animate-spin mx-auto" /> : "Update Product"}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowEditModal(false)
-                                        setEditingProduct(null)
-                                    }}
-                                    className="px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Confirmation */}
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-md w-full p-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Product?</h2>
-                        <p className="text-gray-600 mb-6">
-                            Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={handleDelete}
-                                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold"
-                            >
-                                Delete
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setShowDeleteConfirm(false)
-                                    setProductToDelete(null)
-                                }}
-                                className="flex-1 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
+
+    )
+}
+                    </div >
+                ) : (
+    /* Orders Management Tab */
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center justify-between mb-8">
+            <div>
+                <h1 className="text-3xl font-black text-gray-900 tracking-tight">Order Fulfillment</h1>
+                <p className="text-gray-500 font-medium italic">Manage status transitions and customer shipping info.</p>
+            </div>
+            <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-xs font-black border border-amber-100 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                Action Required: {sellerOrders.filter(o => o.status === 'Paid' || o.status === 'Pending').length}
+            </div>
+        </div>
+
+        {ordersLoading ? (
+            <div className="flex justify-center py-20">
+                <div className="w-12 h-12 border-4 border-[#637D37]/20 border-t-[#637D37] rounded-full animate-spin"></div>
+            </div>
+        ) : sellerOrders.length === 0 ? (
+            <div className="bg-white rounded-[40px] p-20 text-center border-2 border-dashed border-gray-100">
+                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <ListChecks className="text-gray-300 w-8 h-8" />
+                </div>
+                <h2 className="text-xl font-black text-gray-900 mb-1">No orders yet</h2>
+                <p className="text-gray-400 font-medium">When customers buy your items, they'll appear here.</p>
+            </div>
+        ) : (
+            <div className="grid gap-6">
+                {sellerOrders.map((order) => (
+                    <div key={order.id} className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500">
+                        <div className="p-8 lg:p-10">
+                            <div className="flex flex-col lg:flex-row justify-between gap-8 mb-10">
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs font-black text-white bg-[#637D37] px-3 py-1 rounded-full uppercase tracking-widest">
+                                            Order #{order.id.slice(-6).toUpperCase()}
+                                        </span>
+                                        <span className={`text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border ${getStatusStyle(order.status)}`}>
+                                            {order.status}
+                                        </span>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                                        {order.user.userName}
+                                    </h2>
+                                    <div className="flex items-center gap-2 text-gray-400 text-sm font-medium italic">
+                                        <Clock className="w-4 h-4" />
+                                        Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    {order.status === 'Paid' && (
+                                        <button
+                                            onClick={() => updateOrderStatus(order.id, 'Processing')}
+                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all"
+                                        >
+                                            <Truck className="w-4 h-4" />
+                                            Mark Processing
+                                        </button>
+                                    )}
+                                    {order.status === 'Processing' && (
+                                        <button
+                                            onClick={() => updateOrderStatus(order.id, 'Shipped')}
+                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/20 hover:scale-105 active:scale-95 transition-all"
+                                        >
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            Confirm Shipment
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div className="space-y-6">
+                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Your Items in this Order</h3>
+                                    <div className="space-y-4">
+                                        {order.orderItems.map((item) => (
+                                            <div key={item.id} className="flex gap-4 items-center bg-gray-50/50 p-4 rounded-3xl border border-gray-50">
+                                                <div className="w-16 h-16 bg-white rounded-2xl border border-gray-100 p-1">
+                                                    <img src={item.product.imageUrl} alt={item.product.name} className="w-full h-full object-cover rounded-xl" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-black text-gray-900">{item.product.name}</h4>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quantity: {item.quantity}</p>
+                                                    <p className="text-sm font-black text-[#637D37]">₹{item.price * item.quantity}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <h3 className="text-xs font-black text-gray-300 uppercase tracking-widest">Shipping Destination</h3>
+                                    <div className="p-6 bg-[#637D37]/5 rounded-[32px] border border-[#637D37]/10 space-y-4">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-black text-gray-900">{order.user.userName}</p>
+                                            <p className="text-xs font-medium text-gray-500 italic">{order.shippingAddress}</p>
+                                            <p className="text-xs font-medium text-gray-500 italic">{order.city}, {order.state} - {order.zip}</p>
+                                        </div>
+                                        <div className="pt-4 border-t border-[#637D37]/10 flex items-center justify-between">
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone</span>
+                                            <span className="text-xs font-black text-gray-900">{order.phoneNumber}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+)}
+            </div >
+
+    {/* Edit Modal */ }
+{
+    showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
+                    <button
+                        onClick={() => {
+                            setShowEditModal(false)
+                            setEditingProduct(null)
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded-full"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleUpdate} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                        <input
+                            type="text"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea
+                            required
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            rows={3}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                            <input
+                                type="number"
+                                required
+                                min="0"
+                                value={price}
+                                onChange={(e) => setPrice(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                            <input
+                                type="number"
+                                required
+                                min="0"
+                                value={stock}
+                                onChange={(e) => setStock(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#637D37] focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex-1 bg-[#637D37] hover:bg-[#52682d] text-white py-3 rounded-xl font-bold disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="animate-spin mx-auto" /> : "Update Product"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowEditModal(false)
+                                setEditingProduct(null)
+                            }}
+                            className="px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+{/* Delete Confirmation */ }
+{
+    showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Delete Product?</h2>
+                <p className="text-gray-600 mb-6">
+                    Are you sure you want to delete "{productToDelete?.name}"? This action cannot be undone.
+                </p>
+                <div className="flex gap-3">
+                    <button
+                        onClick={handleDelete}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold"
+                    >
+                        Delete
+                    </button>
+                    <button
+                        onClick={() => {
+                            setShowDeleteConfirm(false)
+                            setProductToDelete(null)
+                        }}
+                        className="flex-1 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+        </div >
     )
 }
