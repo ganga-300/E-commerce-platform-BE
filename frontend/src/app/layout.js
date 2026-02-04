@@ -1,13 +1,11 @@
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "./features/shared/components/Navbar";
-import ConditionalFooter from "./components/ConditionalFooter";
+import LayoutWrapper from "./components/LayoutWrapper";
 import { CartProvider } from '../contexts/CartContext.js';
 import { AuthProvider } from '../contexts/AuthContext.js';
 import { ToastProvider } from '../contexts/ToastContext.js';
 import { WishlistProvider } from '../contexts/WishlistContext.js';
 import { Toaster } from 'sonner';
-import { CommandMenu } from "@/components/CommandMenu";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -34,10 +32,9 @@ export default function RootLayout({ children }) {
           <ToastProvider>
             <WishlistProvider>
               <CartProvider>
-                <Navbar />
-                <CommandMenu />
-                {children}
-                <ConditionalFooter />
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
                 <Toaster position="bottom-right" richColors />
               </CartProvider>
             </WishlistProvider>
