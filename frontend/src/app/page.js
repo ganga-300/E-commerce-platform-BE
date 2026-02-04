@@ -16,13 +16,6 @@ export default function Page() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  useEffect(() => {
-    // console.log("Home Page - Current User Role:", user?.role);
-    if (!loading && user?.role?.toUpperCase() === "SELLER") {
-      // console.log("Home Page - Redirecting Seller to /seller");
-      router.push("/seller")
-    }
-  }, [user, loading, router])
 
   if (loading) return null; // Prevent flash of home content
   return (

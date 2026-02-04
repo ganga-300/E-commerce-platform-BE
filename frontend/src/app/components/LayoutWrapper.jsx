@@ -28,9 +28,9 @@ export default function LayoutWrapper({ children }) {
         const role = user?.role?.toUpperCase()
         const isAuthPage = pathname === '/login' || pathname === '/signup'
 
-        if (role === 'ADMIN' && !pathname.startsWith('/admin') && !isAuthPage) {
+        if (role === 'ADMIN' && !pathname.startsWith('/admin') && !isAuthPage && pathname !== '/') {
             router.replace('/admin')
-        } else if (role === 'SELLER' && !pathname.startsWith('/seller') && !isAuthPage) {
+        } else if (role === 'SELLER' && !pathname.startsWith('/seller') && !isAuthPage && pathname !== '/') {
             router.replace('/seller')
         }
     }, [user, loading, pathname, router])
@@ -40,9 +40,9 @@ export default function LayoutWrapper({ children }) {
     const isSellerArea = pathname.startsWith('/seller')
     const role = user?.role?.toUpperCase()
 
-    // Completely hide customer storefront UI for Admins and Sellers
+    // Hide customer storefront UI for Admins and Sellers, EXCEPT on the home page
     const isRestrictedRole = role === 'ADMIN' || role === 'SELLER'
-    const hideCustomerUI = isRestrictedRole || isAdminArea || isSellerArea
+    const hideCustomerUI = (isRestrictedRole && pathname !== '/') || isAdminArea || isSellerArea
 
     // Hide footer on login and signup pages for customers
     const hideFooter = hideCustomerUI || pathname === '/login' || pathname === '/signup'
