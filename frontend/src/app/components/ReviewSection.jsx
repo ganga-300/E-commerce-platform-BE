@@ -137,7 +137,7 @@ export default function ReviewSection({ productId }) {
                             </div>
                             <div className="flex gap-1 justify-center lg:justify-start mb-3">
                                 {[1, 2, 3, 4, 5].map(star => (
-                                    <Star key={star} className={`w-5 h-5 ${(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) >= star ? 'fill-gray-900 text-gray-900' : 'text-gray-300'}`} />
+                                    <Star key={star} className={`w-5 h-5 ${(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
                                 ))}
                             </div>
                             <p className="text-gray-500 font-light text-sm">{reviews.length} Verified Reviews</p>
@@ -191,7 +191,7 @@ export default function ReviewSection({ productId }) {
                                     {[1, 2, 3, 4, 5].map(star => (
                                         <Star
                                             key={star}
-                                            className={`w-8 h-8 cursor-pointer transition-colors ${star <= rating ? 'fill-gray-900 text-gray-900' : 'text-gray-300 hover:text-gray-400'}`}
+                                            className={`w-8 h-8 cursor-pointer transition-colors ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 hover:text-yellow-200'}`}
                                             onClick={() => setRating(star)}
                                         />
                                     ))}
@@ -262,7 +262,7 @@ export default function ReviewSection({ productId }) {
                                         {[1, 2, 3, 4, 5].map(star => (
                                             <Star
                                                 key={star}
-                                                className={`w-4 h-4 ${star <= review.rating ? 'fill-gray-900 text-gray-900' : 'text-gray-200'}`}
+                                                className={`w-4 h-4 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
                                             />
                                         ))}
                                     </div>
