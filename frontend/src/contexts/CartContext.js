@@ -1,12 +1,34 @@
 "use client";
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from './ToastContext';
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [quantity, setQuantity] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
   const { showToast } = useToast();
+
+  // Load from local storage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('cart');
+      if (stored) {
+        setQuantity(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error("Failed to load cart", err);
+    } finally {
+      setIsInitialized(true);
+    }
+  }, []);
+
+  // Save to local storage on change
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('cart', JSON.stringify(quantity));
+    }
+  }, [quantity, isInitialized]);
 
   const addItem = (product) => {
     const isExisting = !!quantity[product.name];

@@ -2,15 +2,16 @@
 import { useState, useEffect, useMemo } from "react"
 import ProductCard from "./ProductCard"
 import { Loader2, Filter, ChevronDown, LayoutGrid, Star } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const categories = ["All", "Stationery", "Books", "Office", "Crafts"]
 
 const SkeletonCard = () => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 w-full max-w-[260px] animate-pulse">
-    <div className="w-full h-48 bg-gray-200 rounded-xl mb-4"></div>
-    <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
-    <div className="h-4 bg-gray-100 rounded w-1/2 mx-auto mb-4"></div>
-    <div className="h-8 bg-gray-200 rounded-full w-2/3 mx-auto"></div>
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 w-full max-w-[260px]">
+    <Skeleton className="w-full h-48 rounded-xl mb-4" />
+    <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+    <Skeleton className="h-4 w-1/2 mx-auto mb-4" />
+    <Skeleton className="h-8 w-2/3 mx-auto rounded-full" />
   </div>
 )
 
