@@ -1,7 +1,7 @@
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./features/shared/components/Navbar";
-import Footer from "./features/shared/components/Footer";
+import ConditionalFooter from "./components/ConditionalFooter";
 import { CartProvider } from '../contexts/CartContext.js';
 import { AuthProvider } from '../contexts/AuthContext.js';
 import { ToastProvider } from '../contexts/ToastContext.js';
@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
                 <Navbar />
                 <CommandMenu />
                 {children}
-                <Footer />
+                <ConditionalFooter />
                 <Toaster position="bottom-right" richColors />
               </CartProvider>
             </WishlistProvider>
