@@ -8,11 +8,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 
 export default function WishlistPage() {
-    const { wishlistItems, removeFromWishlist } = useWishlist()
+    const { wishlistItems, toggleWishlist } = useWishlist()
 
     const handleRemove = (product) => {
-        removeFromWishlist(product.id)
-        toast.success(`${product.name} removed from wishlist`)
+        toggleWishlist(product)
     }
 
     return (
