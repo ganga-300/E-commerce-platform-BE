@@ -6,49 +6,49 @@ const bcrypt = require('bcryptjs');
 
 const products = [
     {
-        name: "Classmate Notebook",
-        description: "High quality 200 pages notebook for students",
-        price: 65,
-        stock: 100,
-        sku: "NB-200-001",
+        name: "Premium Classmate Notebook",
+        description: "Designer 200-page notebook with ultra-smooth ivory paper and a spill-resistant matte cover. Perfect for professional sketches and high-stakes note-taking.",
+        price: 85,
+        stock: 120,
+        sku: "NB-200-PREM",
         family: "Stationery",
-        imageUrl: "https://m.media-amazon.com/images/I/71z78-4Fm+L._AC_UF1000,1000_QL80_.jpg"
+        imageUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=2000&auto=format&fit=crop"
     },
     {
-        name: "Camlin Geometry Box",
-        description: "Complete geometry set for mathematics",
-        price: 70,
-        stock: 50,
-        sku: "GEO-001",
+        name: "Professional Drafting Set",
+        description: "A precision-engineered geometry set featuring stainless steel compasses, a technical protractor, and high-clarity rulers for architectural accuracy.",
+        price: 350,
+        stock: 45,
+        sku: "GEO-PRO-001",
         family: "Stationery",
-        imageUrl: "https://m.media-amazon.com/images/I/61lXdkB1oGL.jpg"
+        imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=2000&auto=format&fit=crop"
     },
     {
-        name: "Apsara Platinum Pencils",
-        description: "Dark and smooth pencils, pack of 10",
-        price: 30,
-        stock: 200,
-        sku: "PENCIL-001",
-        family: "Stationery",
-        imageUrl: "https://m.media-amazon.com/images/I/71m6n2WfLmL._AC_UF1000,1000_QL80_.jpg"
-    },
-    {
-        name: "Camel Poster Colours",
-        description: "12 vibrant shades for artists",
-        price: 120,
-        stock: 30,
-        sku: "COLOR-001",
+        name: "Platinum Artist Pencils",
+        description: "A curated set of 12 dark-core graphite pencils, ranging from 2H to 6B, designed for deep shadows and silky smooth gradients.",
+        price: 150,
+        stock: 85,
+        sku: "PENCIL-PLAT-12",
         family: "Art Supplies",
-        imageUrl: "https://m.media-amazon.com/images/I/61K-qFzFwEL._AC_UF1000,1000_QL80_.jpg"
+        imageUrl: "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?q=80&w=2000&auto=format&fit=crop"
     },
     {
-        name: "Fevicol MR",
-        description: "General purpose adhesive, 200g",
-        price: 35,
-        stock: 150,
-        sku: "GLUE-001",
+        name: "Studio Gouache Set",
+        description: "12 vibrant, high-pigment shades with exceptional opacity and a velvety matte finish. The choice of professional illustrators.",
+        price: 850,
+        stock: 25,
+        sku: "COLOR-STUDIO-12",
+        family: "Art Supplies",
+        imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2000&auto=format&fit=crop"
+    },
+    {
+        name: "Performance Craft Adhesive",
+        description: "High-bond multi-surface adhesive that dries clear and flexible. Essential for heavy-duty papercraft and wood bonding.",
+        price: 95,
+        stock: 200,
+        sku: "GLUE-PERF-200G",
         family: "Craft",
-        imageUrl: "https://m.media-amazon.com/images/I/61F0Y-w0c1L._AC_UF1000,1000_QL80_.jpg"
+        imageUrl: "https://images.unsplash.com/photo-1589149098258-3e9102ca93d3?q=80&w=2000&auto=format&fit=crop"
     }
 ];
 
