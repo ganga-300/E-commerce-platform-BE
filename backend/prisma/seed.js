@@ -12,7 +12,7 @@ const products = [
         stock: 120,
         sku: "NB-200-PREM",
         family: "Stationery",
-        imageUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=2000&auto=format&fit=crop"
+        imageUrl: "https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=2000&auto=format&fit=crop"
     },
     {
         name: "Professional Drafting Set",
@@ -48,7 +48,7 @@ const products = [
         stock: 200,
         sku: "GLUE-PERF-200G",
         family: "Craft",
-        imageUrl: "https://images.unsplash.com/photo-1589149098258-3e9102ca93d3?q=80&w=2000&auto=format&fit=crop"
+        imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2000&auto=format&fit=crop"
     }
 ];
 
