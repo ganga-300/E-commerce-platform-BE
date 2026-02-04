@@ -7,6 +7,7 @@ import Hero from "./components/Hero"
 import Products from "./components/ProductsSection"
 import WhyChooseUs from "./components/WhyChooseUs"
 import Testimonials from "./components/Testimonials"
+import Statistics from "./components/Statistics"
 import Newsletter from "./components/Newsletter"
 import CTASection from "./components/CTASection"
 import PageTransition from "@/components/PageTransition"
@@ -43,6 +44,10 @@ export default function Page() {
 
       <section id="testimonials" className="w-full">
         <Testimonials />
+      </section>
+
+      <section id="statistics" className="w-full">
+        <Statistics />
       </section>
 
       <section id="cta" className="w-full">
