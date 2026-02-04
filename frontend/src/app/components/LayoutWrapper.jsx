@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import Navbar from "../features/shared/components/Navbar"
 import Footer from "../features/shared/components/Footer"
 import { CommandMenu } from "@/components/CommandMenu"
-import AdminSidebar from "../admin/components/AdminSidebar"
+import IntelligenceSidebar from "../admin/intelligence/IntelligenceSidebar"
 import { useAuth } from "../../contexts/AuthContext"
 import { useState } from "react"
 import { Menu } from "lucide-react"
@@ -56,7 +56,7 @@ export default function LayoutWrapper({ children }) {
 
             {isAdminArea ? (
                 <div className="flex min-h-screen bg-gray-50/50">
-                    <AdminSidebar isOpen={isAdminSidebarOpen} setIsOpen={setIsAdminSidebarOpen} />
+                    <IntelligenceSidebar isOpen={isAdminSidebarOpen} setIsOpen={setIsAdminSidebarOpen} />
                     <main className="flex-1 lg:ml-[280px] min-h-screen flex flex-col">
                         {/* Admin Mobile Header */}
                         <div className="lg:hidden flex items-center justify-between p-4 bg-white/70 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-40">

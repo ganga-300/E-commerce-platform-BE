@@ -54,7 +54,7 @@ export default function AdminOrders() {
 
     const fetchOrders = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/orders`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/orders?cb=${Date.now()}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
             const data = await res.json()
@@ -172,9 +172,9 @@ export default function AdminOrders() {
                                     </td>
                                     <td className="px-6 py-8 whitespace-nowrap">
                                         <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${o.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                o.status === 'SHIPPED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                    o.status === 'CANCELLED' ? 'bg-red-50 text-red-600 border-red-100' :
-                                                        'bg-amber-50 text-amber-600 border-amber-100'
+                                            o.status === 'SHIPPED' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                o.status === 'CANCELLED' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                    'bg-amber-50 text-amber-600 border-amber-100'
                                             }`}>
                                             {o.status === 'DELIVERED' && <CheckCircle className="w-3.5 h-3.5" />}
                                             {o.status === 'SHIPPED' && <Truck className="w-3.5 h-3.5" />}

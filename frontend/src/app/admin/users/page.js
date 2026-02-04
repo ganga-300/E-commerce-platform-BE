@@ -65,7 +65,7 @@ export default function AdminUsers() {
         setLoading(true)
         setError(null)
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/users`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/users?cb=${Date.now()}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
             if (!res.ok) throw new Error("Failed to sync platform intelligence")
@@ -233,8 +233,8 @@ export default function AdminUsers() {
                                     </td>
                                     <td className="px-6 py-6 whitespace-nowrap">
                                         <div className={`inline-flex px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${u.role === 'ADMIN' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                u.role === 'SELLER' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                    'bg-gray-50 text-gray-500 border-gray-100'
+                                            u.role === 'SELLER' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                'bg-gray-50 text-gray-500 border-gray-100'
                                             }`}>
                                             {u.role}
                                         </div>

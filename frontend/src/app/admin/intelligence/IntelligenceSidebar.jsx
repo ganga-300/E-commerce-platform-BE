@@ -28,7 +28,7 @@ const navItems = [
     { label: "Approvals", href: "/admin/approvals", icon: ShieldCheck },
 ]
 
-export default function AdminSidebar({ isOpen, setIsOpen }) {
+export default function IntelligenceSidebar({ isOpen, setIsOpen }) {
     const pathname = usePathname()
     const { user, logout } = useAuth()
 

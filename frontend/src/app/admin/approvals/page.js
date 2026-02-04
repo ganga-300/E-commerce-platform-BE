@@ -59,7 +59,7 @@ export default function AdminApprovalsPage() {
 
     const fetchPendingSellers = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/pending-sellers`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/pending-sellers?cb=${Date.now()}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
             if (!res.ok) throw new Error("Failed to fetch pending sellers")

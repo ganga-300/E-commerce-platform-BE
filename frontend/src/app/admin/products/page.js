@@ -53,7 +53,7 @@ export default function AdminProducts() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/products`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/admin/products?cb=${Date.now()}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
             const data = await res.json()
