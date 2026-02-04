@@ -23,4 +23,19 @@ async function getUserOrders(req, res) {
   }
 }
 
-module.exports = { placeUserOrder, getUserOrders };
+module.exports = { placeUserOrder, getUserOrders, getOrder };
+
+async function getOrder(req, res) {
+  const { id } = req.params;
+  try {
+    const { getOrderById } = require("./service.js"); // Late require or top require
+    const order = await getOrderById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.json(order);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch order" });
+  }
+}

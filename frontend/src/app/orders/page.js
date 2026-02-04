@@ -199,7 +199,10 @@ export default function MyOrders() {
                                         </div>
 
                                         <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                                            <button className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+                                            <button
+                                                onClick={() => router.push(`/orders/${order.id}`)}
+                                                className="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors"
+                                            >
                                                 View Order Details <ArrowRight className="w-4 h-4" />
                                             </button>
                                         </div>

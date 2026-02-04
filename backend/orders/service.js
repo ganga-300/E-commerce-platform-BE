@@ -109,7 +109,23 @@ module.exports = {
   // deleteProductFromCart,
   placeOrder,
   viewOrdersByUserId,
+  getOrderById,
 };
+
+async function getOrderById(orderId) {
+  return prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      orderItems: {
+        include: {
+          product: {
+            select: { id: true, name: true, price: true, imageUrl: true },
+          },
+        },
+      },
+    },
+  });
+}
 
 
 
