@@ -90,22 +90,20 @@ export default function ProductsSection() {
         </div>
 
         {/* Category Tabs */}
-        {categories.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.id
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
 
         {/* Products Grid - 5 columns for smaller cards */}
         {loading ? (
