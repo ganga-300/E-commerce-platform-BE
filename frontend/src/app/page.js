@@ -6,6 +6,8 @@ import { useAuth } from "../contexts/AuthContext"
 import Hero from "./components/Hero"
 import Products from "./components/ProductsSection"
 import WhyChooseUs from "./components/WhyChooseUs"
+import Testimonials from "./components/Testimonials"
+import Newsletter from "./components/Newsletter"
 import CTASection from "./components/CTASection"
 import PageTransition from "@/components/PageTransition"
 
@@ -39,9 +41,16 @@ export default function Page() {
         <WhyChooseUs />
       </section>
 
+      <section id="testimonials" className="w-full">
+        <Testimonials />
+      </section>
 
       <section id="cta" className="w-full">
         <CTASection />
+      </section>
+
+      <section id="newsletter" className="w-full">
+        <Newsletter />
       </section>
     </PageTransition>
   )
