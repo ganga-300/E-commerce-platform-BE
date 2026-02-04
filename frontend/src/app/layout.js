@@ -7,6 +7,7 @@ import { AuthProvider } from '../contexts/AuthContext.js';
 import { ToastProvider } from '../contexts/ToastContext.js';
 import { WishlistProvider } from '../contexts/WishlistContext.js';
 import { Toaster } from 'sonner';
+import { CommandMenu } from "@/components/CommandMenu";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
             <WishlistProvider>
               <CartProvider>
                 <Navbar />
+                <CommandMenu />
                 {children}
                 <Footer />
                 <Toaster position="bottom-right" richColors />

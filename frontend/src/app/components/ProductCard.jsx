@@ -24,7 +24,7 @@ export default function ProductCard({ product }) {
     >
       <Link href={`/product/${product.id}`} className="relative block w-full h-56 overflow-hidden cursor-pointer">
         <Image
-          src={product.imageUrl || product.image || "https://premium-stationery.com/placeholder.jpg"}
+          src={product.imageUrl || product.image || "/placeholder.jpg"}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
