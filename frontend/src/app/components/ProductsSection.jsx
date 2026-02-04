@@ -84,8 +84,18 @@ export default function ProductsSection() {
   }
 
   return (
-    <section className="min-h-screen bg-gray-50 py-16 px-6">
+    <section className="min-h-screen bg-white py-20 px-6">
       <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-light text-gray-900 tracking-tight mb-4">
+            Discover Premium Stationery
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Thoughtfully curated products for students and professionals
+          </p>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Sidebar Filters */}
           <aside className="lg:w-64 flex-shrink-0 space-y-10">
