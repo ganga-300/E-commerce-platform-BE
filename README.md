@@ -1,8 +1,3 @@
-Perfect — a strong README will make your full-stack project look **much more professional and “hireable”**.
-
-Here’s a **clean, GitHub-ready README.md** for your **StudyStuff** project 👇
-
----
 
 # 📦 StudyStuff — Full Stack E-Commerce Platform
 
